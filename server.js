@@ -15,26 +15,28 @@ async function main() {
   await mongoose.connect("mongodb://localhost/YouTube_Downloader");
 }
 
-app.get("/view", async (req, res) => {
+app.get("/download/mp3", async (req, res) => {
+  const youtuble_url = req.query.url;
+  const audio = ytdl(youtuble_url, { format: "mp3", filter: "audioonly" });
+  audio.pipe(fs.createWriteStream("audio.mp3"));
+});
+
+app.get("/download/mp4", async (req, res) => {
+  let video_title = null;
   const video_url = req.query.url;
-  const video = ytdl(video_url, { quality: 137 });
-
-  video.on("progress", function (info) {
-    console.log("Downloading...");
-  });
-
-  video.on("end", function (info) {
-    console.log("Downloaded...");
-  });
-
-  video.pipe(fs.createWriteStream("video1.mp4"));
+  const video_id = req.query.url.split("v=")[1];
+  const info = await ytdl.getInfo(req.query.url);
+  video_title = info.videoDetails.title;
+  res.json(info.videoDetails.title);
+  const video = ytdl(video_url);
+  video.pipe(fs.createWriteStream(`${video_title}.mp4`));
 });
 
 app.get("/download", async (req, res) => {
   const v_id = req.query.url.split("v=")[1];
   const info = await ytdl.getInfo(req.query.url);
-  console.log(info);
-  console.log(info.formats[4]);
+  // console.log(info);
+  // console.log(info.formats[4]);
   console.log(info.formats[1]);
 });
 
