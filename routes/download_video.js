@@ -8,7 +8,6 @@ router.get("/mp4", async (req, res) => {
   const video_id = req.query.url.split("v=")[1];
   const info = await ytdl.getInfo(video_id);
   video_title = info.videoDetails.title;
-  res.json(info.videoDetails.title);
   const video = ytdl(video_url);
   video.pipe(fs.createWriteStream(`./videos/${video_title}.mp4`));
 });
