@@ -20,16 +20,12 @@ router.get("/details", async (req, res) => {
 router.get("/mp4", async (req, res) => {
   const video_url = req.query.url;
   const video_id = req.query.url.split("v=")[1];
-  const video_title = await getVideoTitle(video_id);
-  const video = ytdl(video_url);
-  video.pipe(fs.createWriteStream(`./videos/${video_title}.mp4`));
-  res.status(200).json({ message: "Downloaded..." });
-});
-
-async function getVideoTitle(video_id) {
   const video_details = await getVideoDetails(video_id);
-  return video_details.title;
-}
+  const video = ytdl(video_url);
+  video.pipe(fs.createWriteStream(`./videos/${video_details.title}.mp4`));
+  // Give the downloaded file to the client
+  res.status(200).json({ message: "File Downloaded" });
+});
 
 async function getVideoDetails(video_id) {
   try {
