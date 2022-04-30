@@ -3,6 +3,7 @@ const ytdl = require("ytdl-core");
 const fs = require("fs");
 const constants = require("../lib/constants");
 
+// Routers
 router.get("/details", async (req, res) => {
   const video_id = req.query.url.split("v=")[1];
   try {
@@ -24,9 +25,20 @@ router.get("/mp4", async (req, res) => {
   const video = ytdl(video_url);
   video.pipe(fs.createWriteStream(`./videos/${video_details.title}.mp4`));
   // Give the downloaded file to the client
-  res.status(200).json({ message: "File Downloaded" });
+  res.status(200).json({ message: "Video File Downloaded" });
 });
 
+router.get("/mp3", async (req, res) => {
+  const video_url = req.query.url;
+  const video_id = req.query.url.split("v=")[1];
+  const video_details = await getVideoDetails(video_id);
+  const video = ytdl(video_url, { filter: "audioonly" });
+  video.pipe(fs.createWriteStream(`./audios/${video_details.title}.mp3`));
+  // Give the downloaded file to the client
+  res.status(200).json({ message: "Audio File Downloaded" });
+});
+
+// Functions
 async function getVideoDetails(video_id) {
   try {
     const info = await ytdl.getInfo(video_id);
