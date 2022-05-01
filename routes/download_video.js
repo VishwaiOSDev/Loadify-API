@@ -23,7 +23,9 @@ router.get("/mp4", async (req, res) => {
   const video_id = req.query.url.split("v=")[1];
   const video_details = await getVideoDetails(video_id);
   const video = ytdl(video_url);
-  video.pipe(fs.createWriteStream(`./videos/${video_details.title}.mp4`));
+  video.pipe(
+    fs.createWriteStream(`./videos/YouTube/${video_details.title}.mp4`)
+  );
   // Give the downloaded file to the client
   res.status(200).json({ message: "Video File Downloaded" });
 });
@@ -33,7 +35,9 @@ router.get("/mp3", async (req, res) => {
   const video_id = req.query.url.split("v=")[1];
   const video_details = await getVideoDetails(video_id);
   const video = ytdl(video_url, { filter: "audioonly" });
-  video.pipe(fs.createWriteStream(`./audios/${video_details.title}.mp3`));
+  video.pipe(
+    fs.createWriteStream(`./audios/YouTube/${video_details.title}.mp3`)
+  );
   // Give the downloaded file to the client
   res.status(200).json({ message: "Audio File Downloaded" });
 });
