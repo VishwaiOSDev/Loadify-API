@@ -39,11 +39,26 @@ router.get("/mp3", async (req, res) => {
   const video_id = req.query.url.split("v=")[1];
   const video_details = await getVideoDetails(video_id);
   const video = ytdl(video_url, { quality: "highestaudio" });
+  if (!fs.existsSync("./audios/YouTube")) {
+    fs.mkdirSync("./audios/YouTube", { recursive: true });
+  }
   video.pipe(
     fs.createWriteStream(`./audios/YouTube/${video_details.title}.mp3`)
   );
-  // Give the downloaded file to the client
-  res.status(200).json({ message: "Audio File Downloaded" });
+  // cp.exec("ffmpeg -i  -ar 16000 ./audios/YouTube/" + video_details.title + ".wav");
+  cp.spawnSync(ffmpeg, [
+          "-i",
+          "./audios/YouTube/" + video_details.title + ".mp3",
+          "-vn",
+          "-ar",
+          "44100",
+          "-ac",
+          "2",
+          "-b:a",
+          "192k",
+          "./audios/YouTube/" + video_details.title + ".mp3",
+  ]);
+  return res.status(200).json({ message: "Audio File Downloaded" });
 });
 
 router.get("/mux", async (req, res) => {
