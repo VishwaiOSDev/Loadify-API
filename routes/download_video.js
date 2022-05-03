@@ -2,7 +2,9 @@ const router = require("express").Router();
 const ytdl = require("ytdl-core");
 const fs = require("fs");
 const ffmpeg = require("ffmpeg-static");
-const stream = require("stream");
+const ffmpegPath = require("@ffmpeg-installer/ffmpeg").path;
+const ffmpeg_fluent = require("fluent-ffmpeg");
+ffmpeg_fluent.setFfmpegPath(ffmpegPath);
 const cp = require("child_process");
 const readline = require("readline");
 const constants = require("../lib/constants");
@@ -42,23 +44,21 @@ router.get("/mp3", async (req, res) => {
   if (!fs.existsSync("./audios/YouTube")) {
     fs.mkdirSync("./audios/YouTube", { recursive: true });
   }
-  video.pipe(
-    fs.createWriteStream(`./audios/YouTube/${video_details.title}.mp3`)
-  );
-  // cp.exec("ffmpeg -i  -ar 16000 ./audios/YouTube/" + video_details.title + ".wav");
-  cp.spawnSync(ffmpeg, [
-          "-i",
-          "./audios/YouTube/" + video_details.title + ".mp3",
-          "-vn",
-          "-ar",
-          "44100",
-          "-ac",
-          "2",
-          "-b:a",
-          "192k",
-          "./audios/YouTube/" + video_details.title + ".mp3",
-  ]);
-  return res.status(200).json({ message: "Audio File Downloaded" });
+  let start = Date.now();
+  ffmpeg_fluent(video)
+    .audioBitrate(128)
+    .save(`./audios/YouTube/${video_details.title}.mp3`)
+    .on("progress", (p) => {
+      readline.cursorTo(process.stdout, 0);
+      process.stdout.write(`${p.targetSize}kb downloaded`);
+    })
+    .on("end", () => {
+      console.log(`\ndone, thanks - ${(Date.now() - start) / 1000}s`);
+      return res.status(200).json({ message: "Audio File Downloaded" });
+    })
+    .on("error", () => {
+      return res.status(200).json({ message: "Something went wrong" });
+    });
 });
 
 router.get("/mux", async (req, res) => {
@@ -131,14 +131,7 @@ router.get("/mux", async (req, res) => {
     process.stdout.write("\n\n\n\n");
     // clearInterval(progressbarHandle);
   });
-
-  // Link streams
-  // FFmpeg creates the transformer streams and we just have to insert / read data
   ffmpegProcess.stdio[3].on("data", (chunk) => {
-    // Start the progress bar
-    // if (!progressbarHandle)
-    //   progressbarHandle = setInterval(showProgress, progressbarInterval);
-    // Parse the param=value list returned by ffmpeg
     const lines = chunk.toString().trim().split("\n");
     const args = {};
     for (const l of lines) {
