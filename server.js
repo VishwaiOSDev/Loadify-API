@@ -5,12 +5,16 @@ const PORT = 3200;
 
 // Routers
 const videoRoute = require("./routes/download_video");
+const audioRoute = require("./routes/download_audio");
+const detailsRoute = require("./routes/video_details");
 
 // Middleware
 app.use(express.json());
 
 // Routes
-app.use("/api/download", videoRoute);
+app.use("/api/details", detailsRoute);
+app.use("/api/download/video", videoRoute);
+app.use("/api/download/audio", audioRoute);
 
 main().catch((err) => console.log(err));
 
