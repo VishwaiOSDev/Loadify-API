@@ -7,12 +7,30 @@ const ffmpeg = require("ffmpeg-static");
 const getVideoDetailsOf = require("../lib/get_video_details");
 
 router.get("/mp4", async (req, res) => {
+  let video = undefined;
   const video_url = req.query.url;
   const video_id = req.query.url.split("v=")[1];
+  const video_quality = req.query.video_quality;
   const video_details = await getVideoDetailsOf(video_id);
-  const video = ytdl(video_url, { quality: 137 });
+  switch (video_quality) {
+    case "Low":
+      video = ytdl(video_url);
+      break;
+    case "Medium":
+      video = ytdl(video_url, { quality: 136 });
+      break;
+    case "High":
+      video = ytdl(video_url, { quality: 137 });
+      break;
+    default:
+      res
+        .status(400)
+        .json({ message: "Quality of the video is not specified" });
+  }
   video.pipe(
-    fs.createWriteStream(`./videos/YouTube/${video_details.title}.mp4`)
+    fs.createWriteStream(
+      `./videos/YouTube/${video_details.title} ?qty=${video_quality}.mp4`
+    )
   );
   // Give the downloaded file to the client
   res.status(200).json({ message: "Video File Downloaded" });
