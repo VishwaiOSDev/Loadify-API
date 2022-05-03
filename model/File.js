@@ -1,5 +1,20 @@
 const mongoose = require("mongoose");
 
+const thumbnailSchema = mongoose.Schema({
+  url: {
+    type: String,
+    required: true,
+  },
+  width: {
+    type: Number,
+    required: true,
+  },
+  height: {
+    type: Number,
+    required: true,
+  },
+});
+
 const fileSchema = mongoose.Schema({
   id: {
     type: String,
@@ -39,21 +54,6 @@ const fileSchema = mongoose.Schema({
   has_audio: {
     type: Boolean,
     default: false,
-  },
-});
-
-const thumbnailSchema = mongoose.Schema({
-  url: {
-    type: String,
-    required: true,
-  },
-  width: {
-    type: Number,
-    required: true,
-  },
-  height: {
-    type: Number,
-    required: true,
   },
 });
 

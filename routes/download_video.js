@@ -1,9 +1,11 @@
 const fs = require("fs");
 const cp = require("child_process");
 const ytdl = require("ytdl-core");
+const { v4: uuid4 } = require("uuid");
 const router = require("express").Router();
 const ffmpeg = require("ffmpeg-static");
 
+const Files = require("../model/File");
 const constants = require("../lib/constants");
 const getVideoDetailsOf = require("../lib/get_video_details");
 
@@ -28,6 +30,32 @@ router.get("/mp4", async (req, res) => {
         .json({ message: "Quality of the video is not specified" });
   }
 
+  function addFileToDatabase() {
+    Files.findOne({ video_id: video_details.videoId }, (err, result) => {
+      if (err) return res.json({ message: err });
+      if (result == null) {
+        // Insert new item to database
+        try {
+          const document = {
+            id: uuid4(),
+            video_title: video_details.title,
+            video_description: video_details.description,
+            published_date: video_details.publishDate,
+            owner_channel_name: video_details.ownerChannelName,
+            video_id: video_details.videoId,
+            likes: video_details.likes,
+            thumbnails: video_details.thumbnails,
+            qualities_available: [video_quality],
+          };
+          const file_document = new File(document);
+          file_document.save();
+        } catch (err) {
+          console.log("Error inserting new document in database.");
+        }
+      }
+    });
+  }
+
   function downloadFromYTDL(iTag) {
     if (iTag) {
       audioAndVideoMuxer(iTag);
@@ -39,6 +67,7 @@ router.get("/mp4", async (req, res) => {
         )
       );
       video.on("end", () => {
+        addFileToDatabase();
         res.status(200).json({ message: "Video File Downloaded" });
       });
       video.on("error", () => {
@@ -110,6 +139,7 @@ router.get("/mp4", async (req, res) => {
       }
     );
     ffmpegProcess.on("close", () => {
+      addFileToDatabase();
       res.json({ message: "Video file downloaded" });
     });
     ffmpegProcess.on("error", () => {
