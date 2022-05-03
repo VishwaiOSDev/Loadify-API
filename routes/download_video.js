@@ -32,8 +32,12 @@ router.get("/mp4", async (req, res) => {
       `./videos/YouTube/${video_details.title} ?qty=${video_quality}.mp4`
     )
   );
-  // Give the downloaded file to the client
-  res.status(200).json({ message: "Video File Downloaded" });
+  video.on("end", () => {
+    res.status(200).json({ message: "Video File Downloaded" });
+  });
+  video.on("error", () => {
+    res.json({ message: "Something went wrong" });
+  });
 });
 
 router.get("/mux", async (req, res) => {
