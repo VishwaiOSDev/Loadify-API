@@ -17,7 +17,6 @@ router.get("/mp3", async (req, res) => {
   if (!fs.existsSync("./audios/YouTube")) {
     fs.mkdirSync("./audios/YouTube", { recursive: true });
   }
-  let start = Date.now();
   ffmpeg_fluent(video)
     .audioBitrate(128)
     .save(`./audios/YouTube/${video_details.title}.mp3`)
@@ -26,7 +25,6 @@ router.get("/mp3", async (req, res) => {
       process.stdout.write(`${p.targetSize}kb downloaded`);
     })
     .on("end", () => {
-      console.log(`\ndone, thanks - ${(Date.now() - start) / 1000}s`);
       return res.status(200).json({ message: "Audio File Downloaded" });
     })
     .on("error", () => {

@@ -35,7 +35,7 @@ router.get("/mp4", async (req, res) => {
       const video = ytdl(video_url);
       video.pipe(
         fs.createWriteStream(
-          `./videos/YouTube/${video_details.title} ?qty=${video_quality}.mp4`
+          `./videos/YouTube/${video_details.title} ?qlt=${video_quality}.mp4`
         )
       );
       video.on("end", () => {
@@ -93,7 +93,7 @@ router.get("/mp4", async (req, res) => {
         "-c:v",
         "copy",
         // Define output file
-        `./videos/YouTube/${video_details.title} ?qty=${video_quality}.mp4`,
+        `./videos/YouTube/${video_details.title} ?qlt=${video_quality}.mp4`,
       ],
       {
         windowsHide: true,
