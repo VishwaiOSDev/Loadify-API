@@ -19,16 +19,9 @@ app.use("/api/download/audio", audioRoute);
 main().catch((err) => console.log(err));
 
 async function main() {
-  await mongoose.connect("mongodb://localhost/YouTube_Downloader");
+  await mongoose.connect("mongodb://localhost:27017/Loadify");
 }
 
 app.listen(PORT, function () {
   console.log(`Server is running on ${PORT}`);
 });
-
-// TODO:- Completed MP3 later
-// app.get("/download/mp3", async (req, res) => {
-//   const youtuble_url = req.query.url;
-//   const audio = ytdl(youtuble_url, { format: "mp3", filter: "audioonly" });
-//   audio.pipe(fs.createWriteStream("audio.mp3"));
-// });

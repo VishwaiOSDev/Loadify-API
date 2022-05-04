@@ -11,8 +11,7 @@ ffmpeg_fluent.setFfmpegPath(ffmpegPath);
 
 router.get("/mp3", async (req, res) => {
   const video_url = req.query.url;
-  const video_id = req.query.url.split("v=")[1];
-  const video_details = await getVideoDetailsOf(video_id);
+  const video_details = await getVideoDetailsOf(video_url);
   const video = ytdl(video_url, { quality: "highestaudio" });
   if (!fs.existsSync("./audios/YouTube")) {
     fs.mkdirSync("./audios/YouTube", { recursive: true });
