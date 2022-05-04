@@ -31,29 +31,50 @@ router.get("/mp4", async (req, res) => {
   }
 
   function addFileToDatabase() {
-    Files.findOne({ video_id: video_details.videoId }, (err, result) => {
+    Files.findOne({ video_id: video_details.videoId }, async (err, result) => {
       if (err) return res.json({ message: err });
       if (result == null) {
-        // Insert new item to database
+        // Insert New Record
         try {
-          const document = {
-            id: uuid4(),
-            video_title: video_details.title,
-            video_description: video_details.description,
-            published_date: video_details.publishDate,
-            owner_channel_name: video_details.ownerChannelName,
-            video_id: video_details.videoId,
-            likes: video_details.likes,
-            thumbnails: video_details.thumbnails,
-            qualities_available: [video_quality],
-          };
-          const file_document = new File(document);
-          file_document.save();
+          insertNewItemToDatabase();
         } catch (err) {
-          console.log("Error inserting new document in database.");
+          console.log("Error inserting new document in database." + err);
+        }
+      } else {
+        try {
+          updateNoOfDownloads();
+        } catch (err) {
+          console.log("Error updating existing record in database." + err);
         }
       }
     });
+  }
+
+  function updateNoOfDownloads() {
+    Files.updateOne(
+      { video_id: video_details.videoId },
+      { $inc: { downloads: 1 } },
+      { new: true },
+      function (err, response) {
+        if (err) return res.json({ message: err });
+      }
+    );
+  }
+
+  function insertNewItemToDatabase() {
+    const document = {
+      id: uuid4(),
+      video_title: video_details.title,
+      video_description: video_details.description,
+      published_date: video_details.publishDate,
+      owner_channel_name: video_details.ownerChannelName,
+      video_id: video_details.videoId,
+      likes: video_details.likes,
+      thumbnails: video_details.thumbnails,
+      qualities_available: [video_quality],
+    };
+    const file_document = new Files(document);
+    file_document.save();
   }
 
   function downloadFromYTDL(iTag) {

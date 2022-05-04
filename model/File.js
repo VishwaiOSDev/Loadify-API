@@ -55,6 +55,10 @@ const fileSchema = mongoose.Schema({
     type: Boolean,
     default: false,
   },
+  downloads: {
+    type: Number,
+    default: 1,
+  },
 });
 
 module.exports = mongoose.model("Files", fileSchema);
