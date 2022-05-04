@@ -11,9 +11,8 @@ const getVideoDetailsOf = require("../lib/get_video_details");
 
 router.get("/mp4", async (req, res) => {
   const video_url = req.query.url;
-  const video_id = req.query.url.split("v=")[1];
   const video_quality = req.query.video_quality;
-  const video_details = await getVideoDetailsOf(video_id);
+  const video_details = await getVideoDetailsOf(video_url);
   switch (video_quality) {
     case constants.QUALITY.LOW:
       downloadFromYTDL();
