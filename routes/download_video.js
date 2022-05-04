@@ -13,51 +13,82 @@ router.get("/mp4", async (req, res) => {
   const video_url = req.query.url;
   const video_quality = req.query.video_quality;
   const video_details = await getVideoDetailsOf(video_url);
-  switch (video_quality) {
-    case constants.QUALITY.LOW:
-      downloadFromYTDL();
-      break;
-    case constants.QUALITY.MEDIUM:
-      downloadFromYTDL("136");
-      break;
-    case constants.QUALITY.HIGH:
-      downloadFromYTDL("137");
-      break;
-    default:
-      res
-        .status(400)
-        .json({ message: "Quality of the video is not specified" });
+
+  // Check that video is already downloaded or not in database
+  Files.findOne({ video_id: video_details.videoId }, (err, result) => {
+    if (err) return res.json({ message: err });
+    if (result) {
+      if (result.qualities_available.indexOf(video_quality) == -1) {
+        // We don't have the video file just download it.
+        download(video_quality);
+      } else {
+        // Give that file to the client
+        checkQualitiesAndUpdateDownloads();
+      }
+    } else {
+      download(video_quality);
+    }
+  });
+
+  function download() {
+    switch (video_quality) {
+      case constants.QUALITY.LOW:
+        downloadFromYTDL();
+        break;
+      case constants.QUALITY.MEDIUM:
+        downloadFromYTDL("136");
+        break;
+      case constants.QUALITY.HIGH:
+        downloadFromYTDL("137");
+        break;
+      default:
+        res
+          .status(400)
+          .json({ message: "Quality of the video is not specified" });
+    }
   }
 
   function addFileToDatabase() {
-    Files.findOne({ video_id: video_details.videoId }, async (err, result) => {
+    Files.findOne({ video_id: video_details.videoId }, (err, result) => {
       if (err) return res.json({ message: err });
-      if (result == null) {
-        // Insert New Record
-        try {
+      try {
+        if (result == null) {
+          // Insert New Record
           insertNewItemToDatabase();
-        } catch (err) {
-          console.log("Error inserting new document in database." + err);
+        } else {
+          checkQualitiesAndUpdateDownloads();
         }
-      } else {
-        try {
-          updateNoOfDownloads();
-        } catch (err) {
-          console.log("Error updating existing record in database." + err);
-        }
+      } catch (err) {
+        console.log("Error adding to database" + err);
       }
     });
   }
 
-  function updateNoOfDownloads() {
-    Files.updateOne(
-      { video_id: video_details.videoId },
-      { $inc: { downloads: 1 } },
-      { new: true },
-      function (err, response) {
-        if (err) return res.json({ message: err });
+  function checkQualitiesAndUpdateDownloads() {
+    Files.findOne({ video_id: video_details.videoId }, (err, response) => {
+      if (err) return res.json({ message: err });
+      if (response.qualities_available.indexOf(video_quality) == -1) {
+        Files.updateOne(
+          { video_id: video_details.videoId },
+          {
+            $push: { qualities_available: video_quality },
+            $inc: { downloads: 1 },
+          },
+          (err) => {
+            if (err) return res.json({ message: err });
+          }
+        );
+      } else {
+        Files.updateOne(
+          { video_id: video_details.videoId },
+          { $inc: { downloads: 1 } },
+          { new: true },
+          (err) => {
+            if (err) return res.json({ message: err });
+          }
+        );
       }
-    );
+    });
   }
 
   function insertNewItemToDatabase() {

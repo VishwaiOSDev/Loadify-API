@@ -25,7 +25,6 @@ const fileSchema = mongoose.Schema({
   },
   video_description: {
     type: String,
-    required: true,
   },
   published_date: {
     type: String,
