@@ -3,12 +3,13 @@ const ytdl = require("ytdl-core");
 const readline = require("readline");
 const ffmpegPath = require("@ffmpeg-installer/ffmpeg").path;
 const ffmpeg_fluent = require("fluent-ffmpeg");
-const getVideoDetailsOf = require("../../lib/get_video_details");
 const ffmpeg = require("ffmpeg-static");
-const Files = require("../../model/File");
-const constants = require("../../lib/constants");
 const cp = require("child_process");
 const { v4: uuid4 } = require("uuid");
+const getVideoDetailsOf = require("../../lib/get_video_details");
+const Files = require("../../model/File");
+const constants = require("../../lib/constants");
+const extractDetailsFrom = require("../../lib/extract_details");
 
 ffmpeg_fluent.setFfmpegPath(ffmpegPath);
 
@@ -231,7 +232,24 @@ const getAudio = async (request, response) => {
         });
 };
 
+const getDetails = async (request, response) => {
+    const video_url = request.query.url;
+    try {
+        const video_details = await getVideoDetailsOf(video_url);
+        const details = extractDetailsFrom(
+            video_details,
+            constants.YOUTUBE_DETAILS
+        );
+        // Check the usage if the details needed YouTube URL
+        response.json(details);
+    } catch (err) {
+        console.log(`Error getting info ${err}`);
+        response.json({ message: "Something went wrong" + err });
+    }
+};
+
 module.exports = {
     getVideo,
     getAudio,
+    getDetails,
 };
