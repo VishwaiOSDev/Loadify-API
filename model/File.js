@@ -42,6 +42,10 @@ const fileSchema = mongoose.Schema({
     type: Number,
     required: true,
   },
+  length_seconds: {
+    type: Number,
+    required: true,
+  },
   thumbnails: {
     type: [thumbnailSchema],
     required: true,

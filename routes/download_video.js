@@ -15,20 +15,20 @@ router.get("/mp4", async (req, res) => {
   const video_details = await getVideoDetailsOf(video_url);
 
   // Check that video is already downloaded or not in database
-  Files.findOne({ video_id: video_details.videoId }, (err, result) => {
-    if (err) return res.json({ message: err });
-    if (result) {
-      if (result.qualities_available.indexOf(video_quality) == -1) {
-        // We don't have the video file just download it.
-        download(video_quality);
-      } else {
-        // Give that file to the client
-        checkQualitiesAndUpdateDownloads();
-      }
-    } else {
+  const result = await Files.findOne({ video_id: video_details.videoId });
+
+  if (result) {
+    if (result.qualities_available.indexOf(video_quality) == -1) {
+      // We don't have the video file just download that quality
       download(video_quality);
+    } else {
+      // Give the file to the client
+      checkQualitiesAndUpdateDownloads();
     }
-  });
+  } else {
+    // Download the file from YTDL
+    download(video_quality);
+  }
 
   function download() {
     switch (video_quality) {
@@ -48,47 +48,36 @@ router.get("/mp4", async (req, res) => {
     }
   }
 
-  function addFileToDatabase() {
-    Files.findOne({ video_id: video_details.videoId }, (err, result) => {
-      if (err) return res.json({ message: err });
-      try {
-        if (result == null) {
-          // Insert New Record
-          insertNewItemToDatabase();
-        } else {
-          checkQualitiesAndUpdateDownloads();
-        }
-      } catch (err) {
-        console.log("Error adding to database" + err);
-      }
-    });
-  }
-
-  function checkQualitiesAndUpdateDownloads() {
-    Files.findOne({ video_id: video_details.videoId }, (err, response) => {
-      if (err) return res.json({ message: err });
-      if (response.qualities_available.indexOf(video_quality) == -1) {
-        Files.updateOne(
-          { video_id: video_details.videoId },
+  async function checkQualitiesAndUpdateDownloads() {
+    try {
+      if (result.qualities_available.indexOf(video_quality) == -1) {
+        await Files.findByIdAndUpdate(
+          { _id: result._id },
           {
             $push: { qualities_available: video_quality },
             $inc: { downloads: 1 },
-          },
-          (err) => {
-            if (err) return res.json({ message: err });
           }
         );
       } else {
-        Files.updateOne(
-          { video_id: video_details.videoId },
+        await Files.findByIdAndUpdate(
+          { _id: result._id },
           { $inc: { downloads: 1 } },
-          { new: true },
-          (err) => {
-            if (err) return res.json({ message: err });
-          }
+          { new: true }
         );
       }
-    });
+    } catch (err) {
+      res.json({ message: "Failed to update the records" });
+    }
+  }
+
+  function addFileToDatabase() {
+    if (result) {
+      // File already present -> Update Qualities and Increment Downloads
+      checkQualitiesAndUpdateDownloads();
+    } else {
+      // Insert New Record
+      insertNewItemToDatabase();
+    }
   }
 
   function insertNewItemToDatabase() {
@@ -100,6 +89,7 @@ router.get("/mp4", async (req, res) => {
       owner_channel_name: video_details.ownerChannelName,
       video_id: video_details.videoId,
       likes: video_details.likes,
+      length_seconds: video_details.lengthSeconds,
       thumbnails: video_details.thumbnails,
       qualities_available: [video_quality],
     };
