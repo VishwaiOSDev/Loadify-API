@@ -196,7 +196,21 @@ const getVideo = async (request, response) => {
         );
         ffmpegProcess.on("close", () => {
             addFileToDatabase();
-            response.json({ message: "Video file downloaded" });
+            const steam = fs.createReadStream(
+                `./data/videos/YouTube/${video_quality}/${video_details.videoId}.mp4`
+            );
+            response.header("Content-Type", "video/mp4");
+            response.header(
+                "Content-Disposition",
+                "attachment; filename=" + video_details.title + ".mp4"
+            );
+            response.header(
+                "Content-Length",
+                fs.statSync(
+                    `./data/videos/YouTube/${video_quality}/${video_details.videoId}.mp4`
+                ).size
+            );
+            return steam.pipe(response);
         });
         ffmpegProcess.on("error", () => {
             response.json({ message: "Something when wrong" });
@@ -221,9 +235,20 @@ const getAudio = async (request, response) => {
             process.stdout.write(`${p.targetSize}kb downloaded`);
         })
         .on("end", () => {
-            return response
-                .status(200)
-                .json({ message: "Audio File Downloaded" });
+            const steam = fs.createReadStream(
+                `./data/audios/YouTube/${video_details.title}.mp3`
+            );
+            response.header("Content-Type", "video/mp4");
+            response.header(
+                "Content-Disposition",
+                "attachment; filename=" + video_details.title + ".mp4"
+            );
+            response.header(
+                "Content-Length",
+                fs.statSync(`./data/audios/YouTube/${video_details.title}.mp3`)
+                    .size
+            );
+            return steam.pipe(response);
         })
         .on("error", () => {
             return response
