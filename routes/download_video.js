@@ -102,9 +102,14 @@ router.get("/mp4", async (req, res) => {
       audioAndVideoMuxer(iTag);
     } else {
       const video = ytdl(video_url);
+      if (!fs.existsSync(`./data/videos/YouTube/${video_quality}`)) {
+        fs.mkdirSync(`./data/videos/YouTube/${video_quality}`, {
+          recursive: true,
+        });
+      }
       video.pipe(
         fs.createWriteStream(
-          `./videos/YouTube/${video_details.title} ?qlt=${video_quality}.mp4`
+          `./data/videos/YouTube/${video_quality}/${video_details.videoId}.mp4`
         )
       );
       video.on("end", () => {
@@ -138,6 +143,12 @@ router.get("/mp4", async (req, res) => {
         tracker.video = { downloaded, total };
       }
     );
+    // Check directory exists or not
+    if (!fs.existsSync(`./data/videos/YouTube/${video_quality}`)) {
+      fs.mkdirSync(`./data/videos/YouTube/${video_quality}`, {
+        recursive: true,
+      });
+    }
     // Start the ffmpeg child process
     const ffmpegProcess = cp.spawn(
       ffmpeg,
@@ -163,7 +174,7 @@ router.get("/mp4", async (req, res) => {
         "-c:v",
         "copy",
         // Define output file
-        `./videos/YouTube/${video_details.title} ?qlt=${video_quality}.mp4`,
+        `./data/videos/YouTube/${video_quality}/${video_details.videoId}.mp4`,
       ],
       {
         windowsHide: true,

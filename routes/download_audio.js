@@ -13,12 +13,12 @@ router.get("/mp3", async (req, res) => {
   const video_url = req.query.url;
   const video_details = await getVideoDetailsOf(video_url);
   const video = ytdl(video_url, { quality: "highestaudio" });
-  if (!fs.existsSync("./audios/YouTube")) {
-    fs.mkdirSync("./audios/YouTube", { recursive: true });
+  if (!fs.existsSync("./data/audios/YouTube")) {
+    fs.mkdirSync("./data/audios/YouTube", { recursive: true });
   }
   ffmpeg_fluent(video)
     .audioBitrate(128)
-    .save(`./audios/YouTube/${video_details.title}.mp3`)
+    .save(`./data/audios/YouTube/${video_details.title}.mp3`)
     .on("progress", (p) => {
       readline.cursorTo(process.stdout, 0);
       process.stdout.write(`${p.targetSize}kb downloaded`);
