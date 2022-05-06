@@ -266,7 +266,7 @@ const getAudio = async (request, response) => {
                 response.header("Content-Type", "video/mp4");
                 response.header(
                     "Content-Disposition",
-                    "attachment; filename=" + video_details.title + ".mp4"
+                    "attachment; filename=" + video_details.title + ".mp3"
                 );
                 response.header(
                     "Content-Length",
