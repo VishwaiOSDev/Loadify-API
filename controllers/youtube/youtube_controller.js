@@ -10,6 +10,7 @@ const getVideoDetailsOf = require("../../lib/get_video_details");
 const Files = require("../../model/File");
 const constants = require("../../lib/constants");
 const extractDetailsFrom = require("../../lib/extract_details");
+const res = require("express/lib/response");
 
 ffmpeg_fluent.setFfmpegPath(ffmpegPath);
 
@@ -220,34 +221,67 @@ const getAudio = async (request, response) => {
     if (!fs.existsSync("./data/audios/YouTube")) {
         fs.mkdirSync("./data/audios/YouTube", { recursive: true });
     }
-    ffmpeg_fluent(video)
-        .audioBitrate(128)
-        .save(`./data/audios/YouTube/${video_details.title}.mp3`)
-        .on("progress", (p) => {
-            readline.cursorTo(process.stdout, 0);
-            process.stdout.write(`${p.targetSize}kb downloaded`);
-        })
-        .on("end", () => {
-            const steam = fs.createReadStream(
-                `./data/audios/YouTube/${video_details.title}.mp3`
+
+    const result = await Files.findOne({ video_id: video_details.videoId });
+
+    if (result) {
+        if (result.has_audio) {
+            // Give file to client
+            response.json({ message: "Give file to client" });
+        } else {
+            await Files.findByIdAndUpdate(
+                { _id: result._id },
+                { has_audio: true }
             );
-            response.header("Content-Type", "video/mp4");
-            response.header(
-                "Content-Disposition",
-                "attachment; filename=" + video_details.title + ".mp4"
-            );
-            response.header(
-                "Content-Length",
-                fs.statSync(`./data/audios/YouTube/${video_details.title}.mp3`)
-                    .size
-            );
-            return steam.pipe(response);
-        })
-        .on("error", () => {
-            return response
-                .status(200)
-                .json({ message: "Something went wrong" });
-        });
+            // Give file to client
+        }
+    } else {
+        // Download the audio file and insert it in the database
+        downloadAudioFile();
+    }
+
+    function insertNewItemToDatabase() {
+        const document = {
+            id: uuid4(),
+            video_id: video_details.videoId,
+            has_audio: true,
+        };
+        const file_document = new Files(document);
+        file_document.save();
+    }
+
+    function downloadAudioFile() {
+        ffmpeg_fluent(video)
+            .audioBitrate(256)
+            .save(`./data/audios/YouTube/${video_details.title}.mp3`)
+            .on("progress", (p) => {
+                readline.cursorTo(process.stdout, 0);
+                process.stdout.write(`${p.targetSize}kb downloaded`);
+            })
+            .on("end", () => {
+                const steam = fs.createReadStream(
+                    `./data/audios/YouTube/${video_details.title}.mp3`
+                );
+                insertNewItemToDatabase();
+                response.header("Content-Type", "video/mp4");
+                response.header(
+                    "Content-Disposition",
+                    "attachment; filename=" + video_details.title + ".mp4"
+                );
+                response.header(
+                    "Content-Length",
+                    fs.statSync(
+                        `./data/audios/YouTube/${video_details.title}.mp3`
+                    ).size
+                );
+                return steam.pipe(response);
+            })
+            .on("error", () => {
+                return response
+                    .status(200)
+                    .json({ message: "Something went wrong" });
+            });
+    }
 };
 
 const getDetails = async (request, response) => {
