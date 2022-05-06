@@ -87,14 +87,7 @@ const getVideo = async (request, response) => {
     function insertNewItemToDatabase() {
         const document = {
             id: uuid4(),
-            video_title: video_details.title,
-            video_description: video_details.description,
-            published_date: video_details.publishDate,
-            owner_channel_name: video_details.ownerChannelName,
             video_id: video_details.videoId,
-            likes: video_details.likes,
-            length_seconds: video_details.lengthSeconds,
-            thumbnails: video_details.thumbnails,
             qualities_available: [video_quality],
         };
         const file_document = new Files(document);
@@ -213,7 +206,7 @@ const getVideo = async (request, response) => {
             return steam.pipe(response);
         });
         ffmpegProcess.on("error", () => {
-            response.json({ message: "Something when wrong" });
+            response.json({ message: "Something went wrong" });
         });
         audio.pipe(ffmpegProcess.stdio[4]);
         video.pipe(ffmpegProcess.stdio[5]);
