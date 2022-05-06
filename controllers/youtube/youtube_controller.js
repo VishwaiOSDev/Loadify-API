@@ -10,7 +10,6 @@ const getVideoDetailsOf = require("../../lib/get_video_details");
 const Files = require("../../model/File");
 const constants = require("../../lib/constants");
 const extractDetailsFrom = require("../../lib/extract_details");
-const res = require("express/lib/response");
 
 ffmpeg_fluent.setFfmpegPath(ffmpegPath);
 
