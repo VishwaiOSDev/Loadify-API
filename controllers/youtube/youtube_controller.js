@@ -16,6 +16,14 @@ ffmpeg_fluent.setFfmpegPath(ffmpegPath);
 const getVideo = async (request, response) => {
     const video_url = request.query.url;
     const video_quality = request.query.video_quality;
+    if (!video_url && !video_quality) {
+        response.status(400);
+        return response.json({
+            message:
+                "Missing parameters, kindly provide video_url and video_quality",
+            status: 400,
+        });
+    }
     const video_details = await getVideoDetailsOf(video_url);
 
     // Check that video is already downloaded or not in database
@@ -215,6 +223,13 @@ const getVideo = async (request, response) => {
 
 const getAudio = async (request, response) => {
     const video_url = request.query.url;
+    if (!video_url) {
+        response.status(400);
+        return response.json({
+            message: "Missing parameters, kindly provide video_url",
+            status: 400,
+        });
+    }
     const video_details = await getVideoDetailsOf(video_url);
     const video = ytdl(video_url, { quality: "highestaudio" });
     if (!fs.existsSync("./data/audios/YouTube")) {
@@ -285,6 +300,13 @@ const getAudio = async (request, response) => {
 
 const getDetails = async (request, response) => {
     const video_url = request.query.url;
+    if (!video_url) {
+        response.status(400);
+        return response.json({
+            message: "Missing parameters, kindly provide video_url",
+            status: 400,
+        });
+    }
     try {
         const video_details = await getVideoDetailsOf(video_url);
         const details = extractDetailsFrom(
