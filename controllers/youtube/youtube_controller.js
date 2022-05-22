@@ -70,12 +70,44 @@ const getVideo = async (request, response) => {
                         $inc: { downloads: 1 },
                     }
                 );
+                console.log("Flow is in If")
+                const steam = fs.createReadStream(
+                    `./data/videos/YouTube/${video_quality}/${video_details.videoId}.mp4`
+                );
+                response.header("Content-Type", "video/mp4");
+                response.header(
+                    "Content-Disposition",
+                    "attachment; filename=" + video_details.title + ".mp4"
+                );
+                response.header(
+                    "Content-Length",
+                    fs.statSync(
+                        `./data/videos/YouTube/${video_quality}/${video_details.videoId}.mp4`
+                    ).size
+                );
+                return steam.pipe(response);
             } else {
+                console.log("Flow is in Else")
                 await Files.findByIdAndUpdate(
                     { _id: result._id },
                     { $inc: { downloads: 1 } },
                     { new: true }
                 );
+                const steam = fs.createReadStream(
+                    `./data/videos/YouTube/${video_quality}/${video_details.videoId}.mp4`
+                );
+                response.header("Content-Type", "video/mp4");
+                response.header(
+                    "Content-Disposition",
+                    "attachment; filename=" + video_details.title + ".mp4"
+                );
+                response.header(
+                    "Content-Length",
+                    fs.statSync(
+                        `./data/videos/YouTube/${video_quality}/${video_details.videoId}.mp4`
+                    ).size
+                );
+                return steam.pipe(response);
             }
         } catch (err) {
             response.json({ message: "Failed to update the records" });
