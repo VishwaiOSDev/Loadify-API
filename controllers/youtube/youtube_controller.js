@@ -70,6 +70,7 @@ const getVideo = async (request, response) => {
                         $inc: { downloads: 1 },
                     }
                 );
+                console.log("Flow is in If")
                 const steam = fs.createReadStream(
                     `./data/videos/YouTube/${video_quality}/${video_details.videoId}.mp4`
                 );
@@ -86,6 +87,7 @@ const getVideo = async (request, response) => {
                 );
                 return steam.pipe(response);
             } else {
+                console.log("Flow is in Else")
                 await Files.findByIdAndUpdate(
                     { _id: result._id },
                     { $inc: { downloads: 1 } },
