@@ -70,6 +70,9 @@ const getVideo = async (request, response) => {
                         $inc: { downloads: 1 },
                     }
                 );
+                const steam = fs.createReadStream(
+                    `./data/videos/YouTube/${video_quality}/${video_details.videoId}.mp4`
+                );
                 response.header("Content-Type", "video/mp4");
                 response.header(
                     "Content-Disposition",
@@ -87,6 +90,9 @@ const getVideo = async (request, response) => {
                     { _id: result._id },
                     { $inc: { downloads: 1 } },
                     { new: true }
+                );
+                const steam = fs.createReadStream(
+                    `./data/videos/YouTube/${video_quality}/${video_details.videoId}.mp4`
                 );
                 response.header("Content-Type", "video/mp4");
                 response.header(
