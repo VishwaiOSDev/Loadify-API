@@ -70,6 +70,18 @@ const getVideo = async (request, response) => {
                         $inc: { downloads: 1 },
                     }
                 );
+                response.header("Content-Type", "video/mp4");
+                response.header(
+                    "Content-Disposition",
+                    "attachment; filename=" + video_details.title + ".mp4"
+                );
+                response.header(
+                    "Content-Length",
+                    fs.statSync(
+                        `./data/videos/YouTube/${video_quality}/${video_details.videoId}.mp4`
+                    ).size
+                );
+                return steam.pipe(response);
             } else {
                 await Files.findByIdAndUpdate(
                     { _id: result._id },
