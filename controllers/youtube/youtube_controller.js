@@ -132,6 +132,21 @@ const getVideo = async (request, response) => {
         };
         const file_document = new Files(document);
         file_document.save();
+        const steam = fs.createReadStream(
+            `./data/videos/YouTube/${video_quality}/${video_details.videoId}.mp4`
+        );
+        response.header("Content-Type", "video/mp4");
+        response.header(
+            "Content-Disposition",
+            "attachment; filename=" + video_details.title + ".mp4"
+        );
+        response.header(
+            "Content-Length",
+            fs.statSync(
+                `./data/videos/YouTube/${video_quality}/${video_details.videoId}.mp4`
+            ).size
+        );
+        return steam.pipe(response);
     }
 
     function downloadFromYTDL(iTag) {
@@ -151,7 +166,7 @@ const getVideo = async (request, response) => {
             );
             video.on("end", () => {
                 addFileToDatabase();
-                response.status(200).json({ message: "Video File Downloaded" });
+
             });
             video.on("error", () => {
                 response.json({ message: "Something went wrong" });
