@@ -350,7 +350,7 @@ const getDetails = async (request, response) => {
     if (!video_url) {
         response.status(400);
         return response.json({
-            message: "Missing parameters, kindly provide video_url",
+            message: "Missing parameters, kindly provide url",
             status: 400,
         });
     }
@@ -360,11 +360,9 @@ const getDetails = async (request, response) => {
             video_details,
             constants.YOUTUBE_DETAILS
         );
-        // Check the usage if the details needed YouTube URL
         response.json(details);
     } catch (err) {
-        console.log(`Error getting info ${err}`);
-        response.json({ message: "Something went wrong" + err });
+        response.json({ message: `${err}` });
     }
 };
 
