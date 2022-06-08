@@ -169,7 +169,10 @@ const getVideo = async (request, response) => {
                 addFileToDatabase();
             });
             video.on("error", () => {
-                response.json({ message: "Something went wrong" });
+                response.status(400);
+                response.json({
+                    message: "Something went wrong",
+                });
             });
         }
     }
@@ -339,7 +342,7 @@ const getAudio = async (request, response) => {
             })
             .on("error", () => {
                 return response
-                    .status(200)
+                    .status(400)
                     .json({ message: "Something went wrong" });
             });
     }
@@ -360,9 +363,13 @@ const getDetails = async (request, response) => {
             video_details,
             constants.YOUTUBE_DETAILS
         );
+        response.status(200);
         response.json(details);
     } catch (err) {
-        response.json({ message: `${err}` });
+        response.status(400);
+        response.json({
+            message: `${err}`,
+        });
     }
 };
 
