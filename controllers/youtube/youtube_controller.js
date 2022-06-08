@@ -51,7 +51,7 @@ const getVideo = async (request, response) => {
                 downloadFromYTDL("136");
                 break;
             case constants.QUALITY.HIGH:
-                downloadFromYTDL("137");
+                downloadFromYTDL("highestvideo");
                 break;
             default:
                 response
@@ -70,14 +70,13 @@ const getVideo = async (request, response) => {
                         $inc: { downloads: 1 },
                     }
                 );
-                console.log(`Downloading -> ${video_quality}`);
                 const steam = fs.createReadStream(
                     `./data/videos/YouTube/${video_quality}/${video_details.videoId}.mp4`
                 );
                 response.header("Content-Type", "video/mp4");
                 response.header(
                     "Content-Disposition",
-                    "attachment; filename=" + video_details.title + ".mp4"
+                    "attachment; filename=" + video_details.videoId + ".mp4"
                 );
                 response.header(
                     "Content-Length",
@@ -85,9 +84,9 @@ const getVideo = async (request, response) => {
                         `./data/videos/YouTube/${video_quality}/${video_details.videoId}.mp4`
                     ).size
                 );
+                steam.on("end", () => { console.log("Downloaded...") })
                 return steam.pipe(response);
             } else {
-                console.log(`Downloading -> ${video_quality}`);
                 await Files.findByIdAndUpdate(
                     { _id: result._id },
                     { $inc: { downloads: 1 } },
@@ -99,7 +98,7 @@ const getVideo = async (request, response) => {
                 response.header("Content-Type", "video/mp4");
                 response.header(
                     "Content-Disposition",
-                    "attachment; filename=" + video_details.title + ".mp4"
+                    "attachment; filename=" + video_details.videoId + ".mp4"
                 );
                 response.header(
                     "Content-Length",
@@ -107,10 +106,11 @@ const getVideo = async (request, response) => {
                         `./data/videos/YouTube/${video_quality}/${video_details.videoId}.mp4`
                     ).size
                 );
+                steam.on("end", () => { console.log("Downloaded...") })
                 return steam.pipe(response);
             }
         } catch (err) {
-            response.json({ message: "Failed to update the records" });
+            response.json({ message: "Failed to update the records" }).status(400);
         }
     }
 
@@ -146,6 +146,7 @@ const getVideo = async (request, response) => {
                 `./data/videos/YouTube/${video_quality}/${video_details.videoId}.mp4`
             ).size
         );
+        steam.on("end", () => { console.log("Downloaded...") })
         return steam.pipe(response);
     }
 
@@ -153,7 +154,6 @@ const getVideo = async (request, response) => {
         if (iTag) {
             audioAndVideoMuxer(iTag);
         } else {
-            console.log(`Downloading -> ${video_quality}`);
             const video = ytdl(video_url);
             if (!fs.existsSync(`./data/videos/YouTube/${video_quality}`)) {
                 fs.mkdirSync(`./data/videos/YouTube/${video_quality}`, {
@@ -245,29 +245,15 @@ const getVideo = async (request, response) => {
                 ],
             }
         );
-        ffmpegProcess.on("close", () => {
-            addFileToDatabase();
-            const steam = fs.createReadStream(
-                `./data/videos/YouTube/${video_quality}/${video_details.videoId}.mp4`
-            );
-            response.header("Content-Type", "video/mp4");
-            response.header(
-                "Content-Disposition",
-                "attachment; filename=" + video_details.title + ".mp4"
-            );
-            response.header(
-                "Content-Length",
-                fs.statSync(
-                    `./data/videos/YouTube/${video_quality}/${video_details.videoId}.mp4`
-                ).size
-            );
-            return steam.pipe(response);
-        });
-        ffmpegProcess.on("error", () => {
-            response.json({ message: "Something went wrong" });
-        });
         audio.pipe(ffmpegProcess.stdio[4]);
         video.pipe(ffmpegProcess.stdio[5]);
+        ffmpegProcess.on("exit", () => {
+            addFileToDatabase();
+        });
+        ffmpegProcess.on("error", () => {r
+            response.status(400);
+            response.json({ message: "Something went wrong" });
+        });
     }
 };
 
@@ -317,27 +303,28 @@ const getAudio = async (request, response) => {
     function downloadAudioFile() {
         ffmpeg_fluent(video)
             .audioBitrate(256)
-            .save(`./data/audios/YouTube/${video_details.title}.mp3`)
+            .save(`./data/audios/YouTube/${video_details.videoId}.mp3`)
             .on("progress", (p) => {
                 readline.cursorTo(process.stdout, 0);
                 process.stdout.write(`${p.targetSize}kb downloaded`);
             })
             .on("end", () => {
                 const steam = fs.createReadStream(
-                    `./data/audios/YouTube/${video_details.title}.mp3`
+                    `./data/audios/YouTube/${video_details.videoId}.mp3`
                 );
                 insertNewItemToDatabase();
                 response.header("Content-Type", "video/mp4");
                 response.header(
                     "Content-Disposition",
-                    "attachment; filename=" + video_details.title + ".mp3"
+                    "attachment; filename=" + video_details.videoId + ".mp3"
                 );
                 response.header(
                     "Content-Length",
                     fs.statSync(
-                        `./data/audios/YouTube/${video_details.title}.mp3`
+                        `./data/audios/YouTube/${video_details.videoId}.mp3`
                     ).size
                 );
+                steam.on("end", () => { console.log("Downloaded...") })
                 return steam.pipe(response);
             })
             .on("error", () => {
