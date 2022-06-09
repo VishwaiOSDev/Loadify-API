@@ -51,7 +51,7 @@ const getVideo = async (request, response) => {
                 downloadFromYTDL("136");
                 break;
             case constants.QUALITY.HIGH:
-                downloadFromYTDL("highestvideo");
+                downloadFromYTDL("137");
                 break;
             default:
                 response
@@ -212,8 +212,10 @@ const getVideo = async (request, response) => {
     }
 
     function streamVideoToClient() {
+        var readOpts = {highWaterMark: 1000};
         const stream = fs.createReadStream(
-            `./data/videos/YouTube/${video_quality}/${video_details.videoId}.mp4`
+            `./data/videos/YouTube/${video_quality}/${video_details.videoId}.mp4`,
+            readOpts
         );
         response.header("Content-Type", "video/mp4");
         response.header(
@@ -226,7 +228,7 @@ const getVideo = async (request, response) => {
                 `./data/videos/YouTube/${video_quality}/${video_details.videoId}.mp4`
             ).size
         );
-        stream.on("end", () => { console.log("Downloaded...") })
+        stream.on("end", () => { console.log("Video file downloaded.")} )
         return stream.pipe(response);
     }
 };
