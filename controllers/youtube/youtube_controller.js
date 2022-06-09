@@ -70,44 +70,14 @@ const getVideo = async (request, response) => {
                         $inc: { downloads: 1 },
                     }
                 );
-                const steam = fs.createReadStream(
-                    `./data/videos/YouTube/${video_quality}/${video_details.videoId}.mp4`
-                );
-                response.header("Content-Type", "video/mp4");
-                response.header(
-                    "Content-Disposition",
-                    "attachment; filename=" + video_details.videoId + ".mp4"
-                );
-                response.header(
-                    "Content-Length",
-                    fs.statSync(
-                        `./data/videos/YouTube/${video_quality}/${video_details.videoId}.mp4`
-                    ).size
-                );
-                steam.on("end", () => { console.log("Downloaded...") })
-                return steam.pipe(response);
+                streamVideoToClient();
             } else {
                 await Files.findByIdAndUpdate(
                     { _id: result._id },
                     { $inc: { downloads: 1 } },
                     { new: true }
                 );
-                const steam = fs.createReadStream(
-                    `./data/videos/YouTube/${video_quality}/${video_details.videoId}.mp4`
-                );
-                response.header("Content-Type", "video/mp4");
-                response.header(
-                    "Content-Disposition",
-                    "attachment; filename=" + video_details.videoId + ".mp4"
-                );
-                response.header(
-                    "Content-Length",
-                    fs.statSync(
-                        `./data/videos/YouTube/${video_quality}/${video_details.videoId}.mp4`
-                    ).size
-                );
-                steam.on("end", () => { console.log("Downloaded...") })
-                return steam.pipe(response);
+                streamVideoToClient();
             }
         } catch (err) {
             response.json({ message: "Failed to update the records" }).status(400);
@@ -132,22 +102,7 @@ const getVideo = async (request, response) => {
         };
         const file_document = new Files(document);
         file_document.save();
-        const steam = fs.createReadStream(
-            `./data/videos/YouTube/${video_quality}/${video_details.videoId}.mp4`
-        );
-        response.header("Content-Type", "video/mp4");
-        response.header(
-            "Content-Disposition",
-            "attachment; filename=" + video_details.title + ".mp4"
-        );
-        response.header(
-            "Content-Length",
-            fs.statSync(
-                `./data/videos/YouTube/${video_quality}/${video_details.videoId}.mp4`
-            ).size
-        );
-        steam.on("end", () => { console.log("Downloaded...") })
-        return steam.pipe(response);
+        streamVideoToClient()
     }
 
     function downloadFromYTDL(iTag) {
@@ -254,6 +209,25 @@ const getVideo = async (request, response) => {
             response.status(400);
             response.json({ message: "Something went wrong" });
         });
+    }
+
+    function streamVideoToClient() {
+        const stream = fs.createReadStream(
+            `./data/videos/YouTube/${video_quality}/${video_details.videoId}.mp4`
+        );
+        response.header("Content-Type", "video/mp4");
+        response.header(
+            "Content-Disposition",
+            "attachment; filename=" + video_details.videoId + ".mp4"
+        );
+        response.header(
+            "Content-Length",
+            fs.statSync(
+                `./data/videos/YouTube/${video_quality}/${video_details.videoId}.mp4`
+            ).size
+        );
+        stream.on("end", () => { console.log("Downloaded...") })
+        return stream.pipe(response);
     }
 };
 
