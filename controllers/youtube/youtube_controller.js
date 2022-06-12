@@ -7,9 +7,9 @@ const ffmpeg = require("ffmpeg-static");
 const cp = require("child_process");
 const { v4: uuid4 } = require("uuid");
 const getVideoDetailsOf = require("../../lib/get_video_details");
-const Files = require("../../model/File");
 const constants = require("../../lib/constants");
 const extractDetailsFrom = require("../../lib/extract_details");
+const YouTube = require("../../model/YouTube");
 
 ffmpeg_fluent.setFfmpegPath(ffmpegPath);
 
@@ -27,7 +27,7 @@ const getVideo = async (request, response) => {
     const video_details = await getVideoDetailsOf(video_url);
 
     // Check that video is already downloaded or not in database
-    const result = await Files.findOne({ video_id: video_details.videoId });
+    const result = await YouTube.findOne({ video_id: video_details.videoId });
 
     if (result) {
         if (result.qualities_available.indexOf(video_quality) == -1) {
@@ -63,7 +63,7 @@ const getVideo = async (request, response) => {
     async function checkQualitiesAndUpdateDownloads() {
         try {
             if (result.qualities_available.indexOf(video_quality) == -1) {
-                await Files.findByIdAndUpdate(
+                await YouTube.findByIdAndUpdate(
                     { _id: result._id },
                     {
                         $push: { qualities_available: video_quality },
@@ -72,7 +72,7 @@ const getVideo = async (request, response) => {
                 );
                 streamVideoToClient();
             } else {
-                await Files.findByIdAndUpdate(
+                await YouTube.findByIdAndUpdate(
                     { _id: result._id },
                     { $inc: { downloads: 1 } },
                     { new: true }
@@ -100,7 +100,7 @@ const getVideo = async (request, response) => {
             video_id: video_details.videoId,
             qualities_available: [video_quality],
         };
-        const file_document = new Files(document);
+        const file_document = new YouTube(document);
         file_document.save();
         streamVideoToClient()
     }
@@ -248,14 +248,14 @@ const getAudio = async (request, response) => {
         fs.mkdirSync("./data/audios/YouTube", { recursive: true });
     }
 
-    const result = await Files.findOne({ video_id: video_details.videoId });
+    const result = await YouTube.findOne({ video_id: video_details.videoId });
 
     if (result) {
         if (result.has_audio) {
             // Give file to client
             response.json({ message: "Give file to client" });
         } else {
-            await Files.findByIdAndUpdate(
+            await YouTube.findByIdAndUpdate(
                 { _id: result._id },
                 { has_audio: true }
             );
@@ -272,7 +272,7 @@ const getAudio = async (request, response) => {
             video_id: video_details.videoId,
             has_audio: true,
         };
-        const file_document = new Files(document);
+        const file_document = new YouTube(document);
         file_document.save();
     }
 

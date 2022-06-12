@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const fileSchema = mongoose.Schema({
+const youtubeSchema = mongoose.Schema({
     id: {
         type: String,
     },
@@ -22,4 +22,4 @@ const fileSchema = mongoose.Schema({
     },
 });
 
-module.exports = mongoose.model("Files", fileSchema);
+module.exports = mongoose.model("youtube", youtubeSchema);
