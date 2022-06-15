@@ -24,7 +24,8 @@ const getVideo = async (request, response) => {
             status: 400,
         });
     }
-    const video_details = await getVideoDetailsOf(video_url);
+    const info = await getVideoDetailsOf(video_url);
+    const video_details = info.videoDetails
 
     // Check that video is already downloaded or not in database
     const result = await YouTube.findOne({ video_id: video_details.videoId });
@@ -48,16 +49,35 @@ const getVideo = async (request, response) => {
                 downloadFromYTDL();
                 break;
             case constants.QUALITY.MEDIUM:
-                downloadFromYTDL("136");
+                if(checkWhetherQualityIsAvailableToDownload(136)) {
+                    downloadFromYTDL("136");
+                } else {
+                    showUnableToDownloadRequestedQuality()
+                }
                 break;
             case constants.QUALITY.HIGH:
-                downloadFromYTDL("137");
+                if(checkWhetherQualityIsAvailableToDownload(137)) {
+                    downloadFromYTDL("137");
+                } else {
+                    showUnableToDownloadRequestedQuality()
+                }                
                 break;
             default:
                 response
                     .status(400)
                     .json({ message: "Quality of the video is not specified" });
         }
+    }
+
+    function checkWhetherQualityIsAvailableToDownload(receivedITag) {
+        const video_fomarts = info.formats;
+        return video_fomarts.find(({ itag }) => itag == Number(receivedITag));
+    }
+
+    function showUnableToDownloadRequestedQuality() {
+        response.status(400).json({
+            message: `The requested quality is not supported`,
+        });
     }
 
     async function checkQualitiesAndUpdateDownloads() {
@@ -205,6 +225,16 @@ const getVideo = async (request, response) => {
         ffmpegProcess.on("exit", () => {
             addFileToDatabase();
         });
+
+        // Errors are handled here
+        audio.on("error", ()=> {
+            response.status(400);
+            response.json({ message: "Something went wrong" });
+        })
+        video.on("error", () => {
+            response.status(400);
+            response.json({ message: "Something went wrong" });
+        })
         ffmpegProcess.on("error", () => {r
             response.status(400);
             response.json({ message: "Something went wrong" });
@@ -321,9 +351,9 @@ const getDetails = async (request, response) => {
         });
     }
     try {
-        const video_details = await getVideoDetailsOf(video_url);
+        const info = await getVideoDetailsOf(video_url);
         const details = extractDetailsFrom(
-            video_details,
+            info.videoDetails,
             constants.YOUTUBE_DETAILS
         );
         response.status(200);
