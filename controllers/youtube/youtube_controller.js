@@ -238,16 +238,7 @@ const getVideo = async (request, response) => {
         ffmpegProcess.on("exit", () => {
             addFileToDatabase();
         });
-
-        // Errors are handled here
-        audio.on("error", ()=> {
-            response.status(400);
-            response.json({ message: "Something went wrong" });
-        })
-        video.on("error", () => {
-            response.status(400);
-            response.json({ message: "Something went wrong" });
-        })
+        
         ffmpegProcess.on("error", () => {r
             response.status(400);
             response.json({ message: "Something went wrong" });
