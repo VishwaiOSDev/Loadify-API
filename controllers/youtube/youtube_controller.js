@@ -27,6 +27,8 @@ const getVideo = async (request, response) => {
     const info = await getVideoDetailsOf(video_url);
     const video_details = info.videoDetails
 
+    checkTheDurationOfTheVideo()
+
     // Check that video is already downloaded or not in database
     const result = await YouTube.findOne({ video_id: video_details.videoId });
 
@@ -66,6 +68,14 @@ const getVideo = async (request, response) => {
                 response
                     .status(400)
                     .json({ message: "Quality of the video is not specified" });
+        }
+    }
+
+    function checkTheDurationOfTheVideo() {
+        const videoLengthInSeconds = parseInt(video_details.lengthSeconds)
+        if(videoLengthInSeconds >= 900) {
+            response.status(400)
+            response.json({message: "Requested video length is too high"})
         }
     }
 
@@ -190,6 +200,8 @@ const getVideo = async (request, response) => {
                 // Redirect/Enable progress messages
                 "-progress",
                 "pipe:3",
+                // Overwrite the file
+                "-y",
                 // Set inputs
                 "-i",
                 "pipe:4",
