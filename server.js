@@ -1,7 +1,7 @@
 const express = require("express");
 const app = express();
 const mongoose = require("mongoose");
-const PORT = 3200;
+const PORT = 3201;
 
 // Middleware
 app.use(express.json());
