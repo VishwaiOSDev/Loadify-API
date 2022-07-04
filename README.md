@@ -1,5 +1,7 @@
 # Loadify API
 
+## Loadify is a place to download YouTube Videos
+
 This contains the documentation for the endpoints with required paramters.
 
 -   `Headers`: Additional headers required, excluding the `Content-Type`, so if its shown as `none` then ignore
