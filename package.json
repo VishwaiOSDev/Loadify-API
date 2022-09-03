@@ -1,28 +1,28 @@
 {
-  "name": "youtube_downloader",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "start": "nodemon server.js"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "@ffmpeg-installer/ffmpeg": "^1.1.0",
-    "cheerio": "^1.0.0-rc.11",
-    "express": "^4.17.3",
-    "ffmpeg": "^0.0.4",
-    "ffmpeg-static": "^5.0.0",
-    "fluent-ffmpeg": "^2.1.2",
-    "got": "^12.1.0",
-    "mongoose": "^6.3.1",
-    "pm2": "^5.2.0",
-    "uuid": "^8.3.2",
-    "ytdl-core": "github:VishwaiOSDev/ytdl-core"
-  },
-  "devDependencies": {
-    "nodemon": "^2.0.15"
-  }
+    "name": "youtube_downloader",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "scripts": {
+        "start": "nodemon server.js"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+        "@ffmpeg-installer/ffmpeg": "^1.1.0",
+        "cheerio": "^1.0.0-rc.11",
+        "express": "^4.17.3",
+        "ffmpeg": "^0.0.4",
+        "ffmpeg-static": "^5.0.0",
+        "fluent-ffmpeg": "^2.1.2",
+        "got": "^12.1.0",
+        "mongoose": "^6.3.1",
+        "pm2": "^5.2.0",
+        "uuid": "^8.3.2",
+        "ytdl-core": "^4.11.1"
+    },
+    "devDependencies": {
+        "nodemon": "^2.0.15"
+    }
 }
