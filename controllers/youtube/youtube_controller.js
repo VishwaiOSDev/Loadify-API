@@ -14,7 +14,7 @@ const YouTube = require("../../model/YouTube");
 ffmpeg_fluent.setFfmpegPath(ffmpegPath);
 
 const getVideo = async (request, response) => {
-    request.setTimeout(900000)
+    request.setTimeout(900000);
     const video_url = request.query.url;
     const video_quality = request.query.video_quality;
     if (!video_url && !video_quality) {
@@ -26,9 +26,9 @@ const getVideo = async (request, response) => {
         });
     }
     const info = await getVideoDetailsOf(video_url);
-    const video_details = info.videoDetails
+    const video_details = info.videoDetails;
 
-    checkTheDurationOfTheVideo()
+    checkTheDurationOfTheVideo();
 
     // Check that video is already downloaded or not in database
     const result = await YouTube.findOne({ video_id: video_details.videoId });
@@ -52,31 +52,35 @@ const getVideo = async (request, response) => {
                 downloadFromYTDL();
                 break;
             case constants.QUALITY.MEDIUM:
-                if(checkWhetherQualityIsAvailableToDownload(136)) {
+                if (checkWhetherQualityIsAvailableToDownload(136)) {
                     downloadFromYTDL("136");
                 } else {
-                    showUnableToDownloadRequestedQuality()
+                    showUnableToDownloadRequestedQuality();
                 }
                 break;
             case constants.QUALITY.HIGH:
-                if(checkWhetherQualityIsAvailableToDownload(137)) {
+                if (checkWhetherQualityIsAvailableToDownload(137)) {
                     downloadFromYTDL("137");
                 } else {
-                    showUnableToDownloadRequestedQuality()
-                }                
+                    showUnableToDownloadRequestedQuality();
+                }
                 break;
             default:
-                response
-                    .status(400)
-                    .json({ message: "Quality of the video is not specified" });
+                response.status(400).json({
+                    message: "Quality of the video is not specified",
+                    status: 400,
+                });
         }
     }
 
     function checkTheDurationOfTheVideo() {
-        const videoLengthInSeconds = parseInt(video_details.lengthSeconds)
-        if(videoLengthInSeconds >= 900) {
-            response.status(400)
-            response.json({message: "Requested video length is too high"})
+        const videoLengthInSeconds = parseInt(video_details.lengthSeconds);
+        if (videoLengthInSeconds >= 900) {
+            response.status(400);
+            response.json({
+                message: "Requested video length is too high",
+                status: 400,
+            });
         }
     }
 
@@ -88,6 +92,7 @@ const getVideo = async (request, response) => {
     function showUnableToDownloadRequestedQuality() {
         response.status(400).json({
             message: `The requested quality is not supported`,
+            status: 400,
         });
     }
 
@@ -111,7 +116,12 @@ const getVideo = async (request, response) => {
                 streamVideoToClient();
             }
         } catch (err) {
-            response.json({ message: "Failed to update the records" }).status(400);
+            response
+                .json({
+                    message: "Failed to update the records",
+                    status: 400,
+                })
+                .status(400);
         }
     }
 
@@ -133,7 +143,7 @@ const getVideo = async (request, response) => {
         };
         const file_document = new YouTube(document);
         file_document.save();
-        streamVideoToClient()
+        streamVideoToClient();
     }
 
     function downloadFromYTDL(iTag) {
@@ -158,6 +168,7 @@ const getVideo = async (request, response) => {
                 response.status(400);
                 response.json({
                     message: "Something went wrong",
+                    status: 400,
                 });
             });
         }
@@ -238,15 +249,18 @@ const getVideo = async (request, response) => {
         ffmpegProcess.on("exit", () => {
             addFileToDatabase();
         });
-        
-        ffmpegProcess.on("error", () => {r
+
+        ffmpegProcess.on("error", () => {
             response.status(400);
-            response.json({ message: "Something went wrong" });
+            response.json({
+                message: "Something went wrong",
+                status: 400,
+            });
         });
     }
 
     function streamVideoToClient() {
-        var readOpts = {highWaterMark: 1000};
+        var readOpts = { highWaterMark: 1000 };
         const stream = fs.createReadStream(
             `./data/videos/YouTube/${video_quality}/${video_details.videoId}.mp4`,
             readOpts
@@ -262,7 +276,9 @@ const getVideo = async (request, response) => {
                 `./data/videos/YouTube/${video_quality}/${video_details.videoId}.mp4`
             ).size
         );
-        stream.on("end", () => { console.log("Video file downloaded.")} )
+        stream.on("end", () => {
+            console.log("Video file downloaded.");
+        });
         return stream.pipe(response);
     }
 };
@@ -334,13 +350,16 @@ const getAudio = async (request, response) => {
                         `./data/audios/YouTube/${video_details.videoId}.mp3`
                     ).size
                 );
-                steam.on("end", () => { console.log("Downloaded...") })
+                steam.on("end", () => {
+                    console.log("Downloaded...");
+                });
                 return steam.pipe(response);
             })
             .on("error", () => {
-                return response
-                    .status(400)
-                    .json({ message: "Something went wrong" });
+                return response.status(400).json({
+                    message: "Something went wrong",
+                    status: 400,
+                });
             });
     }
 };
@@ -366,6 +385,7 @@ const getDetails = async (request, response) => {
         response.status(400);
         response.json({
             message: `${err}`,
+            status: 400,
         });
     }
 };
