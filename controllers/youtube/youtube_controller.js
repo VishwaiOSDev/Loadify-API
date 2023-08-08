@@ -16,6 +16,7 @@ const getVideo = async (request, response) => {
     request.setTimeout(900000);
     const video_url = request.query.url;
     const video_quality = request.query.video_quality;
+
     if (!video_url && !video_quality) {
         response.status(400);
         return response.json({
@@ -24,28 +25,31 @@ const getVideo = async (request, response) => {
             status: 400,
         });
     }
+
     const info = await getVideoDetailsOf(video_url);
     const video_details = info.videoDetails;
-
-    checkTheDurationOfTheVideo();
 
     download(video_quality);
 
     function download() {
         switch (video_quality) {
             case constants.QUALITY.LOW:
-                steamVideoToClient();
+                sendVideoToClient();
                 break;
             case constants.QUALITY.MEDIUM:
-                if (checkWhetherQualityIsAvailableToDownload(136)) {
-                    downloadFromYTDL("136");
+                const isMediumQualityAvailable =
+                    checkWhetherQualityIsAvailableToDownload(136);
+                if (isMediumQualityAvailable) {
+                    audioAndVideoMuxer("136");
                 } else {
                     showUnableToDownloadRequestedQuality();
                 }
                 break;
             case constants.QUALITY.HIGH:
-                if (checkWhetherQualityIsAvailableToDownload(137)) {
-                    downloadFromYTDL("137");
+                const isHighQualityAvailable =
+                    checkWhetherQualityIsAvailableToDownload(137);
+                if (isHighQualityAvailable) {
+                    audioAndVideoMuxer("137");
                 } else {
                     showUnableToDownloadRequestedQuality();
                 }
@@ -58,7 +62,7 @@ const getVideo = async (request, response) => {
         }
     }
 
-    function steamVideoToClient() {
+    function sendVideoToClient() {
         const video = ytdl(video_url);
         video.pipe(response);
         video.on("error", () => {
@@ -68,17 +72,6 @@ const getVideo = async (request, response) => {
                 status: 400,
             });
         });
-    }
-
-    function checkTheDurationOfTheVideo() {
-        const videoLengthInSeconds = parseInt(video_details.lengthSeconds);
-        if (videoLengthInSeconds >= 900) {
-            response.status(400);
-            response.json({
-                message: "Requested video length is too high",
-                status: 400,
-            });
-        }
     }
 
     function checkWhetherQualityIsAvailableToDownload(receivedITag) {
@@ -141,22 +134,6 @@ const getVideo = async (request, response) => {
         const file_document = new YouTube(document);
         file_document.save();
         streamVideoToClient();
-    }
-
-    function downloadFromYTDL(iTag) {
-        if (iTag) {
-            audioAndVideoMuxer(iTag);
-        } else {
-            const video = ytdl(video_url);
-            video.pipe(response);
-            video.on("error", () => {
-                response.status(400);
-                response.json({
-                    message: "Something went wrong",
-                    status: 400,
-                });
-            });
-        }
     }
 
     function audioAndVideoMuxer(iTag) {
