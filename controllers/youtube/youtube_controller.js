@@ -9,7 +9,6 @@ const { v4: uuid4 } = require("uuid");
 const getVideoDetailsOf = require("../../lib/get_video_details");
 const constants = require("../../lib/constants");
 const extractDetailsFrom = require("../../lib/extract_details");
-const YouTube = require("../../model/YouTube");
 
 ffmpeg_fluent.setFfmpegPath(ffmpegPath);
 
@@ -30,26 +29,12 @@ const getVideo = async (request, response) => {
 
     checkTheDurationOfTheVideo();
 
-    // Check that video is already downloaded or not in database
-    const result = await YouTube.findOne({ video_id: video_details.videoId });
-
-    if (result) {
-        if (result.qualities_available.indexOf(video_quality) == -1) {
-            // We don't have the video file just download that quality
-            download(video_quality);
-        } else {
-            // Give the file to the client
-            checkQualitiesAndUpdateDownloads();
-        }
-    } else {
-        // Download the file from YTDL
-        download(video_quality);
-    }
+    download(video_quality);
 
     function download() {
         switch (video_quality) {
             case constants.QUALITY.LOW:
-                downloadFromYTDL();
+                steamVideoToClient();
                 break;
             case constants.QUALITY.MEDIUM:
                 if (checkWhetherQualityIsAvailableToDownload(136)) {
@@ -71,6 +56,18 @@ const getVideo = async (request, response) => {
                     status: 400,
                 });
         }
+    }
+
+    function steamVideoToClient() {
+        const video = ytdl(video_url);
+        video.pipe(response);
+        video.on("error", () => {
+            response.status(400);
+            response.json({
+                message: "Something went wrong",
+                status: 400,
+            });
+        });
     }
 
     function checkTheDurationOfTheVideo() {
@@ -151,19 +148,7 @@ const getVideo = async (request, response) => {
             audioAndVideoMuxer(iTag);
         } else {
             const video = ytdl(video_url);
-            if (!fs.existsSync(`./data/videos/YouTube/${video_quality}`)) {
-                fs.mkdirSync(`./data/videos/YouTube/${video_quality}`, {
-                    recursive: true,
-                });
-            }
-            video.pipe(
-                fs.createWriteStream(
-                    `./data/videos/YouTube/${video_quality}/${video_details.videoId}.mp4`
-                )
-            );
-            video.on("end", () => {
-                addFileToDatabase();
-            });
+            video.pipe(response);
             video.on("error", () => {
                 response.status(400);
                 response.json({
@@ -195,12 +180,9 @@ const getVideo = async (request, response) => {
                 tracker.video = { downloaded, total };
             }
         );
-        // Check directory exists or not
-        if (!fs.existsSync(`./data/videos/YouTube/${video_quality}`)) {
-            fs.mkdirSync(`./data/videos/YouTube/${video_quality}`, {
-                recursive: true,
-            });
-        }
+
+        const filePath = `${video_details.videoId}.mp4`;
+
         // Start the ffmpeg child process
         const ffmpegProcess = cp.spawn(
             ffmpeg,
@@ -228,7 +210,7 @@ const getVideo = async (request, response) => {
                 "-c:v",
                 "copy",
                 // Define output file
-                `./data/videos/YouTube/${video_quality}/${video_details.videoId}.mp4`,
+                filePath,
             ],
             {
                 windowsHide: true,
@@ -244,10 +226,16 @@ const getVideo = async (request, response) => {
                 ],
             }
         );
+
         audio.pipe(ffmpegProcess.stdio[4]);
         video.pipe(ffmpegProcess.stdio[5]);
-        ffmpegProcess.on("exit", () => {
-            addFileToDatabase();
+
+        video.on("close", () => {
+            console.log("Closed Video...");
+        });
+
+        ffmpegProcess.on("close", () => {
+            streamVideoToClientNow();
         });
 
         ffmpegProcess.on("error", () => {
@@ -259,10 +247,12 @@ const getVideo = async (request, response) => {
         });
     }
 
-    function streamVideoToClient() {
+    function streamVideoToClientNow() {
+        const filePath = `${video_details.videoId}.mp4`;
+
         var readOpts = { highWaterMark: 1000 };
         const stream = fs.createReadStream(
-            `./data/videos/YouTube/${video_quality}/${video_details.videoId}.mp4`,
+            `${video_details.videoId}.mp4`,
             readOpts
         );
         response.header("Content-Type", "video/mp4");
@@ -272,12 +262,15 @@ const getVideo = async (request, response) => {
         );
         response.header(
             "Content-Length",
-            fs.statSync(
-                `./data/videos/YouTube/${video_quality}/${video_details.videoId}.mp4`
-            ).size
+            fs.statSync(`${video_details.videoId}.mp4`).size
         );
-        stream.on("end", () => {
-            console.log("Video file downloaded.");
+        stream.on("close", () => {
+            console.log("Closed...");
+            fs.unlink(filePath, (err) => {
+                if (err) {
+                    console.error("Error deleting file:", err);
+                }
+            });
         });
         return stream.pipe(response);
     }
