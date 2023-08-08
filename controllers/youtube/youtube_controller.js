@@ -202,6 +202,8 @@ const getVideo = async (request, response) => {
 
 const getAudio = async (request, response) => {
     const video_url = request.query.url;
+    const filePath = `${video_details.videoId}.mp3`;
+
     if (!video_url) {
         response.status(400);
         return response.json({
@@ -209,58 +211,39 @@ const getAudio = async (request, response) => {
             status: 400,
         });
     }
+
     const video_details = await getVideoDetailsOf(video_url);
     const video = ytdl(video_url, { quality: "highestaudio" });
-    if (!fs.existsSync("./data/audios/YouTube")) {
-        fs.mkdirSync("./data/audios/YouTube", { recursive: true });
-    }
 
-    const result = await YouTube.findOne({ video_id: video_details.videoId });
-
-    if (result) {
-        if (result.has_audio) {
-            // Give file to client
-            response.json({ message: "Give file to client" });
-        } else {
-            await YouTube.findByIdAndUpdate(
-                { _id: result._id },
-                { has_audio: true }
-            );
-            // Give file to client
-        }
-    } else {
-        // Download the audio file and insert it in the database
-        downloadAudioFile();
-    }
+    downloadAudioFile();
 
     function downloadAudioFile() {
         ffmpeg_fluent(video)
             .audioBitrate(256)
-            .save(`./data/audios/YouTube/${video_details.videoId}.mp3`)
+            .save(filePath)
             .on("progress", (p) => {
                 readline.cursorTo(process.stdout, 0);
                 process.stdout.write(`${p.targetSize}kb downloaded`);
             })
             .on("end", () => {
-                const steam = fs.createReadStream(
-                    `./data/audios/YouTube/${video_details.videoId}.mp3`
-                );
-                insertNewItemToDatabase();
-                response.header("Content-Type", "video/mp4");
+                const stream = fs.createReadStream(filePath);
+
+                response.header("Content-Type", "video/mp3");
                 response.header(
                     "Content-Disposition",
                     "attachment; filename=" + video_details.videoId + ".mp3"
                 );
-                response.header(
-                    "Content-Length",
-                    fs.statSync(
-                        `./data/audios/YouTube/${video_details.videoId}.mp3`
-                    ).size
-                );
-                steam.on("end", () => {
-                    console.log("Downloaded...");
+                response.header("Content-Length", fs.statSync(filePath).size);
+
+                stream.on("close", () => {
+                    fs.unlink(filePath, (err) => {
+                        if (err) {
+                            console.error("Error deleting file:", err);
+                        }
+                    });
                 });
-                return steam.pipe(response);
+
+                return stream.pipe(response);
             })
             .on("error", () => {
                 return response.status(400).json({
