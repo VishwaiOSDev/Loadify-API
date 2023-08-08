@@ -202,7 +202,6 @@ const getVideo = async (request, response) => {
 
 const getAudio = async (request, response) => {
     const video_url = request.query.url;
-    const filePath = `${video_details.videoId}.mp3`;
 
     if (!video_url) {
         response.status(400);
@@ -212,7 +211,9 @@ const getAudio = async (request, response) => {
         });
     }
 
-    const video_details = await getVideoDetailsOf(video_url);
+    const info = await getVideoDetailsOf(video_url);
+    const video_details = info.videoDetails;
+    const filePath = `${video_details.videoId}.mp3`;
     const video = ytdl(video_url, { quality: "highestaudio" });
 
     downloadAudioFile();
@@ -221,9 +222,8 @@ const getAudio = async (request, response) => {
         ffmpeg_fluent(video)
             .audioBitrate(256)
             .save(filePath)
-            .on("progress", (p) => {
+            .on("progress", () => {
                 readline.cursorTo(process.stdout, 0);
-                process.stdout.write(`${p.targetSize}kb downloaded`);
             })
             .on("end", () => {
                 const stream = fs.createReadStream(filePath);
@@ -231,7 +231,7 @@ const getAudio = async (request, response) => {
                 response.header("Content-Type", "video/mp3");
                 response.header(
                     "Content-Disposition",
-                    "attachment; filename=" + video_details.videoId + ".mp3"
+                    "attachment; filename=" + video_details.title + ".mp3"
                 );
                 response.header("Content-Length", fs.statSync(filePath).size);
 
