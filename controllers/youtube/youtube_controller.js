@@ -156,10 +156,6 @@ const getVideo = async (request, response) => {
         audio.pipe(ffmpegProcess.stdio[4]);
         video.pipe(ffmpegProcess.stdio[5]);
 
-        video.on("close", () => {
-            console.log("Closed Video...");
-        });
-
         ffmpegProcess.on("close", () => {
             streamVideoToClientNow();
         });
@@ -193,7 +189,6 @@ const getVideo = async (request, response) => {
         );
 
         stream.on("close", () => {
-            console.log("Closed...");
             fs.unlink(filePath, (err) => {
                 if (err) {
                     console.error("Error deleting file:", err);
