@@ -12,7 +12,6 @@ const extractDetailsFrom = require("../../lib/extract_details");
 ffmpeg_fluent.setFfmpegPath(ffmpegPath);
 
 const getVideo = async (request, response) => {
-    request.setTimeout(900000);
     const video_url = request.query.url;
     const video_quality = request.query.video_quality;
 
