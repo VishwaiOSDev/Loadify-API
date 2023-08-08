@@ -5,11 +5,9 @@ const ffmpegPath = require("@ffmpeg-installer/ffmpeg").path;
 const ffmpeg_fluent = require("fluent-ffmpeg");
 const ffmpeg = require("ffmpeg-static");
 const cp = require("child_process");
-const { v4: uuid4 } = require("uuid");
 const getVideoDetailsOf = require("../../lib/get_video_details");
 const constants = require("../../lib/constants");
 const extractDetailsFrom = require("../../lib/extract_details");
-const YouTube = require("../../model/YouTube");
 
 ffmpeg_fluent.setFfmpegPath(ffmpegPath);
 
@@ -17,6 +15,7 @@ const getVideo = async (request, response) => {
     request.setTimeout(900000);
     const video_url = request.query.url;
     const video_quality = request.query.video_quality;
+
     if (!video_url && !video_quality) {
         response.status(400);
         return response.json({
@@ -25,42 +24,31 @@ const getVideo = async (request, response) => {
             status: 400,
         });
     }
+
     const info = await getVideoDetailsOf(video_url);
     const video_details = info.videoDetails;
 
-    checkTheDurationOfTheVideo();
-
-    // Check that video is already downloaded or not in database
-    const result = await YouTube.findOne({ video_id: video_details.videoId });
-
-    if (result) {
-        if (result.qualities_available.indexOf(video_quality) == -1) {
-            // We don't have the video file just download that quality
-            download(video_quality);
-        } else {
-            // Give the file to the client
-            checkQualitiesAndUpdateDownloads();
-        }
-    } else {
-        // Download the file from YTDL
-        download(video_quality);
-    }
+    download(video_quality);
 
     function download() {
         switch (video_quality) {
             case constants.QUALITY.LOW:
-                downloadFromYTDL();
+                sendVideoToClient();
                 break;
             case constants.QUALITY.MEDIUM:
-                if (checkWhetherQualityIsAvailableToDownload(136)) {
-                    downloadFromYTDL("136");
+                const isMediumQualityAvailable =
+                    checkWhetherQualityIsAvailableToDownload(136);
+                if (isMediumQualityAvailable) {
+                    audioAndVideoMuxer("136");
                 } else {
                     showUnableToDownloadRequestedQuality();
                 }
                 break;
             case constants.QUALITY.HIGH:
-                if (checkWhetherQualityIsAvailableToDownload(137)) {
-                    downloadFromYTDL("137");
+                const isHighQualityAvailable =
+                    checkWhetherQualityIsAvailableToDownload(137);
+                if (isHighQualityAvailable) {
+                    audioAndVideoMuxer("137");
                 } else {
                     showUnableToDownloadRequestedQuality();
                 }
@@ -73,15 +61,16 @@ const getVideo = async (request, response) => {
         }
     }
 
-    function checkTheDurationOfTheVideo() {
-        const videoLengthInSeconds = parseInt(video_details.lengthSeconds);
-        if (videoLengthInSeconds >= 900) {
+    function sendVideoToClient() {
+        const video = ytdl(video_url);
+        video.pipe(response);
+        video.on("error", () => {
             response.status(400);
             response.json({
-                message: "Requested video length is too high",
+                message: "Something went wrong",
                 status: 400,
             });
-        }
+        });
     }
 
     function checkWhetherQualityIsAvailableToDownload(receivedITag) {
@@ -94,84 +83,6 @@ const getVideo = async (request, response) => {
             message: `The requested quality is not supported`,
             status: 400,
         });
-    }
-
-    async function checkQualitiesAndUpdateDownloads() {
-        try {
-            if (result.qualities_available.indexOf(video_quality) == -1) {
-                await YouTube.findByIdAndUpdate(
-                    { _id: result._id },
-                    {
-                        $push: { qualities_available: video_quality },
-                        $inc: { downloads: 1 },
-                    }
-                );
-                streamVideoToClient();
-            } else {
-                await YouTube.findByIdAndUpdate(
-                    { _id: result._id },
-                    { $inc: { downloads: 1 } },
-                    { new: true }
-                );
-                streamVideoToClient();
-            }
-        } catch (err) {
-            response
-                .json({
-                    message: "Failed to update the records",
-                    status: 400,
-                })
-                .status(400);
-        }
-    }
-
-    function addFileToDatabase() {
-        if (result) {
-            // File already present -> Update Qualities and Increment Downloads
-            checkQualitiesAndUpdateDownloads();
-        } else {
-            // Insert New Record
-            insertNewItemToDatabase();
-        }
-    }
-
-    function insertNewItemToDatabase() {
-        const document = {
-            id: uuid4(),
-            video_id: video_details.videoId,
-            qualities_available: [video_quality],
-        };
-        const file_document = new YouTube(document);
-        file_document.save();
-        streamVideoToClient();
-    }
-
-    function downloadFromYTDL(iTag) {
-        if (iTag) {
-            audioAndVideoMuxer(iTag);
-        } else {
-            const video = ytdl(video_url);
-            if (!fs.existsSync(`./data/videos/YouTube/${video_quality}`)) {
-                fs.mkdirSync(`./data/videos/YouTube/${video_quality}`, {
-                    recursive: true,
-                });
-            }
-            video.pipe(
-                fs.createWriteStream(
-                    `./data/videos/YouTube/${video_quality}/${video_details.videoId}.mp4`
-                )
-            );
-            video.on("end", () => {
-                addFileToDatabase();
-            });
-            video.on("error", () => {
-                response.status(400);
-                response.json({
-                    message: "Something went wrong",
-                    status: 400,
-                });
-            });
-        }
     }
 
     function audioAndVideoMuxer(iTag) {
@@ -195,12 +106,9 @@ const getVideo = async (request, response) => {
                 tracker.video = { downloaded, total };
             }
         );
-        // Check directory exists or not
-        if (!fs.existsSync(`./data/videos/YouTube/${video_quality}`)) {
-            fs.mkdirSync(`./data/videos/YouTube/${video_quality}`, {
-                recursive: true,
-            });
-        }
+
+        const filePath = `${video_details.videoId}.mp4`;
+
         // Start the ffmpeg child process
         const ffmpegProcess = cp.spawn(
             ffmpeg,
@@ -228,7 +136,7 @@ const getVideo = async (request, response) => {
                 "-c:v",
                 "copy",
                 // Define output file
-                `./data/videos/YouTube/${video_quality}/${video_details.videoId}.mp4`,
+                filePath,
             ],
             {
                 windowsHide: true,
@@ -244,10 +152,12 @@ const getVideo = async (request, response) => {
                 ],
             }
         );
+
         audio.pipe(ffmpegProcess.stdio[4]);
         video.pipe(ffmpegProcess.stdio[5]);
-        ffmpegProcess.on("exit", () => {
-            addFileToDatabase();
+
+        ffmpegProcess.on("close", () => {
+            streamVideoToClientNow();
         });
 
         ffmpegProcess.on("error", () => {
@@ -259,12 +169,15 @@ const getVideo = async (request, response) => {
         });
     }
 
-    function streamVideoToClient() {
+    function streamVideoToClientNow() {
         var readOpts = { highWaterMark: 1000 };
+
+        const filePath = `${video_details.videoId}.mp4`;
         const stream = fs.createReadStream(
-            `./data/videos/YouTube/${video_quality}/${video_details.videoId}.mp4`,
+            `${video_details.videoId}.mp4`,
             readOpts
         );
+
         response.header("Content-Type", "video/mp4");
         response.header(
             "Content-Disposition",
@@ -272,13 +185,17 @@ const getVideo = async (request, response) => {
         );
         response.header(
             "Content-Length",
-            fs.statSync(
-                `./data/videos/YouTube/${video_quality}/${video_details.videoId}.mp4`
-            ).size
+            fs.statSync(`${video_details.videoId}.mp4`).size
         );
-        stream.on("end", () => {
-            console.log("Video file downloaded.");
+
+        stream.on("close", () => {
+            fs.unlink(filePath, (err) => {
+                if (err) {
+                    console.error("Error deleting file:", err);
+                }
+            });
         });
+
         return stream.pipe(response);
     }
 };
@@ -314,16 +231,6 @@ const getAudio = async (request, response) => {
     } else {
         // Download the audio file and insert it in the database
         downloadAudioFile();
-    }
-
-    function insertNewItemToDatabase() {
-        const document = {
-            id: uuid4(),
-            video_id: video_details.videoId,
-            has_audio: true,
-        };
-        const file_document = new YouTube(document);
-        file_document.save();
     }
 
     function downloadAudioFile() {
