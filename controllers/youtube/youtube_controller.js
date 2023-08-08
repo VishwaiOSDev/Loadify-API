@@ -5,7 +5,6 @@ const ffmpegPath = require("@ffmpeg-installer/ffmpeg").path;
 const ffmpeg_fluent = require("fluent-ffmpeg");
 const ffmpeg = require("ffmpeg-static");
 const cp = require("child_process");
-const { v4: uuid4 } = require("uuid");
 const getVideoDetailsOf = require("../../lib/get_video_details");
 const constants = require("../../lib/constants");
 const extractDetailsFrom = require("../../lib/extract_details");
@@ -84,56 +83,6 @@ const getVideo = async (request, response) => {
             message: `The requested quality is not supported`,
             status: 400,
         });
-    }
-
-    async function checkQualitiesAndUpdateDownloads() {
-        try {
-            if (result.qualities_available.indexOf(video_quality) == -1) {
-                await YouTube.findByIdAndUpdate(
-                    { _id: result._id },
-                    {
-                        $push: { qualities_available: video_quality },
-                        $inc: { downloads: 1 },
-                    }
-                );
-                streamVideoToClient();
-            } else {
-                await YouTube.findByIdAndUpdate(
-                    { _id: result._id },
-                    { $inc: { downloads: 1 } },
-                    { new: true }
-                );
-                streamVideoToClient();
-            }
-        } catch (err) {
-            response
-                .json({
-                    message: "Failed to update the records",
-                    status: 400,
-                })
-                .status(400);
-        }
-    }
-
-    function addFileToDatabase() {
-        if (result) {
-            // File already present -> Update Qualities and Increment Downloads
-            checkQualitiesAndUpdateDownloads();
-        } else {
-            // Insert New Record
-            insertNewItemToDatabase();
-        }
-    }
-
-    function insertNewItemToDatabase() {
-        const document = {
-            id: uuid4(),
-            video_id: video_details.videoId,
-            qualities_available: [video_quality],
-        };
-        const file_document = new YouTube(document);
-        file_document.save();
-        streamVideoToClient();
     }
 
     function audioAndVideoMuxer(iTag) {
@@ -225,13 +174,14 @@ const getVideo = async (request, response) => {
     }
 
     function streamVideoToClientNow() {
-        const filePath = `${video_details.videoId}.mp4`;
-
         var readOpts = { highWaterMark: 1000 };
+
+        const filePath = `${video_details.videoId}.mp4`;
         const stream = fs.createReadStream(
             `${video_details.videoId}.mp4`,
             readOpts
         );
+
         response.header("Content-Type", "video/mp4");
         response.header(
             "Content-Disposition",
@@ -241,6 +191,7 @@ const getVideo = async (request, response) => {
             "Content-Length",
             fs.statSync(`${video_details.videoId}.mp4`).size
         );
+
         stream.on("close", () => {
             console.log("Closed...");
             fs.unlink(filePath, (err) => {
@@ -249,6 +200,7 @@ const getVideo = async (request, response) => {
                 }
             });
         });
+
         return stream.pipe(response);
     }
 };
@@ -284,16 +236,6 @@ const getAudio = async (request, response) => {
     } else {
         // Download the audio file and insert it in the database
         downloadAudioFile();
-    }
-
-    function insertNewItemToDatabase() {
-        const document = {
-            id: uuid4(),
-            video_id: video_details.videoId,
-            has_audio: true,
-        };
-        const file_document = new YouTube(document);
-        file_document.save();
     }
 
     function downloadAudioFile() {
