@@ -1,13 +1,14 @@
-const router = require("express").Router();
-
-const {
+import { Router } from "express";
+import {
     getVideo,
     getAudio,
     getDetails,
-} = require("../controllers/youtube/youtube_controller");
+} from "../controllers/youtube/youtube_controller.js";
+
+const router = Router();
 
 router.get("/details", getDetails);
 router.get("/download/video/mp4", getVideo);
 router.get("/download/audio/mp3", getAudio);
 
-module.exports = router;
+export default router;

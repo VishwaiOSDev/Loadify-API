@@ -1,19 +1,23 @@
-const fs = require("fs");
-const ytdl = require("ytdl-core");
-const readline = require("readline");
-const ffmpegPath = require("@ffmpeg-installer/ffmpeg").path;
-const ffmpeg_fluent = require("fluent-ffmpeg");
-const ffmpeg = require("ffmpeg-static");
-const cp = require("child_process");
-const getVideoDetailsOf = require("../../lib/get_video_details");
-const constants = require("../../lib/constants");
-const extractDetailsFrom = require("../../lib/extract_details");
+import fs from "fs";
+import ytdl from "ytdl-core";
+import readline from "readline";
+import ffmpegPath from "@ffmpeg-installer/ffmpeg";
+import ffmpeg_fluent from "fluent-ffmpeg";
+import ffmpeg from "ffmpeg-static";
+import cp from "child_process";
+import getVideoDetails from "../../lib/get_video_details.js";
+import {YOUTUBE_DETAILS,QUALITY} from "../../lib/constants.js";
+import { extractDetailsFrom } from "../../lib/extract_details.js";
+import express, { Request, Response } from "express";
 
-ffmpeg_fluent.setFfmpegPath(ffmpegPath);
 
-const getVideo = async (request, response) => {
-    const video_url = request.query.url;
-    const video_quality = request.query.video_quality;
+
+
+ffmpeg_fluent.setFfmpegPath(`${ffmpegPath}`);
+
+export const getVideo = async (request:Request, response:Response) => {
+    const video_url:any = request.query.url;
+    const video_quality:any = request.query.video_quality;
 
     if (!video_url && !video_quality) {
         response.status(400);
@@ -24,17 +28,17 @@ const getVideo = async (request, response) => {
         });
     }
 
-    const info = await getVideoDetailsOf(video_url);
+    const info = await getVideoDetails(video_url);
     const video_details = info.videoDetails;
 
     download(video_quality);
 
-    function download() {
+    function download(video_quality:string) {
         switch (video_quality) {
-            case constants.QUALITY.LOW:
+            case QUALITY.LOW:
                 sendVideoToClient();
                 break;
-            case constants.QUALITY.MEDIUM:
+            case QUALITY.MEDIUM:
                 const isMediumQualityAvailable =
                     checkWhetherQualityIsAvailableToDownload(136);
                 if (isMediumQualityAvailable) {
@@ -43,7 +47,7 @@ const getVideo = async (request, response) => {
                     showUnableToDownloadRequestedQuality();
                 }
                 break;
-            case constants.QUALITY.HIGH:
+            case QUALITY.HIGH:
                 const isHighQualityAvailable =
                     checkWhetherQualityIsAvailableToDownload(137);
                 if (isHighQualityAvailable) {
@@ -109,8 +113,8 @@ const getVideo = async (request, response) => {
         const filePath = `${video_details.videoId}.mp4`;
 
         // Start the ffmpeg child process
-        const ffmpegProcess = cp.spawn(
-            ffmpeg,
+        const ffmpegProcess:any = cp.spawn(
+            `${ffmpeg}`,
             [
                 // Remove ffmpeg's console spamming
                 "-loglevel",
@@ -176,15 +180,17 @@ const getVideo = async (request, response) => {
             `${video_details.videoId}.mp4`,
             readOpts
         );
-
+        
         response.header("Content-Type", "video/mp4");
         response.header(
             "Content-Disposition",
             "attachment; filename=" + video_details.videoId + ".mp4"
         );
+        const videoStats = fs.statSync(`${video_details.videoId}.mp4`);
+        const contentLength = videoStats.size.toString();
         response.header(
             "Content-Length",
-            fs.statSync(`${video_details.videoId}.mp4`).size
+            contentLength
         );
 
         stream.on("close", () => {
@@ -199,8 +205,8 @@ const getVideo = async (request, response) => {
     }
 };
 
-const getAudio = async (request, response) => {
-    const video_url = request.query.url;
+export const getAudio = async (request:Request, response:Response) => {
+    const video_url:any = request.query.url;
 
     if (!video_url) {
         response.status(400);
@@ -210,7 +216,7 @@ const getAudio = async (request, response) => {
         });
     }
 
-    const info = await getVideoDetailsOf(video_url);
+    const info = await getVideoDetails(video_url);
     const video_details = info.videoDetails;
     const filePath = `${video_details.videoId}.mp3`;
     const video = ytdl(video_url, { quality: "highestaudio" });
@@ -232,7 +238,9 @@ const getAudio = async (request, response) => {
                     "Content-Disposition",
                     "attachment; filename=" + video_details.title + ".mp3"
                 );
-                response.header("Content-Length", fs.statSync(filePath).size);
+                const videoStats = fs.statSync(filePath);
+                const contentLength = videoStats.size.toString();
+                response.header("Content-Length", contentLength);
 
                 stream.on("close", () => {
                     fs.unlink(filePath, (err) => {
@@ -253,8 +261,9 @@ const getAudio = async (request, response) => {
     }
 };
 
-const getDetails = async (request, response) => {
-    const video_url = request.query.url;
+export const getDetails = async (request:Request, response:Response) => {
+    const video_url:any = request.query.url;
+    console.log("hello",video_url)
     if (!video_url) {
         response.status(400);
         return response.json({
@@ -263,10 +272,10 @@ const getDetails = async (request, response) => {
         });
     }
     try {
-        const info = await getVideoDetailsOf(video_url);
+        const info = await getVideoDetails(video_url);
         const details = extractDetailsFrom(
             info.videoDetails,
-            constants.YOUTUBE_DETAILS
+            YOUTUBE_DETAILS
         );
         response.status(200);
         response.json(details);
@@ -279,8 +288,3 @@ const getDetails = async (request, response) => {
     }
 };
 
-module.exports = {
-    getVideo,
-    getAudio,
-    getDetails,
-};
