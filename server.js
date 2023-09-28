@@ -5,6 +5,8 @@ const fs = require("fs");
 const app = express();
 const PORT = 3200;
 
+app.set("trust proxy", true);
+
 // Create a directory for log files (if it doesn't exist)
 const logDirectory = path.join(__dirname, "logs");
 fs.existsSync(logDirectory) || fs.mkdirSync(logDirectory);
