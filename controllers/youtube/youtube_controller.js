@@ -262,7 +262,18 @@ const getDetails = async (request, response) => {
             status: 400,
         });
     }
+
+    const isInstagramURL = isInstagramVideoURL(video_url);
+
     try {
+        if (isInstagramURL) {
+            // Redirect to Instagram route
+            return response.redirect(
+                307,
+                "/api/ig/details?url=" + encodeURIComponent(video_url)
+            );
+        }
+
         const info = await getVideoDetailsOf(video_url);
         const details = extractDetailsFrom(
             info.videoDetails,
@@ -277,6 +288,10 @@ const getDetails = async (request, response) => {
             status: 400,
         });
     }
+};
+
+const isInstagramVideoURL = (url) => {
+    return url.startsWith("https://www.instagram.com/");
 };
 
 module.exports = {
