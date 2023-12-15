@@ -29,6 +29,7 @@ app.use(morgan(morganFormat, { stream: logStream })); // Log to file
 // Define your routes
 app.use("/api/yt/", require("./routes/youtube_routes"));
 app.use("/api/ig/", require("./routes/instagram_routes"));
+app.use("/api/tk/", require("./routes/tiktok_routes"));
 
 // Start the Express server
 app.listen(PORT, function () {
