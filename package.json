@@ -20,6 +20,6 @@
         "morgan": "^1.10.0",
         "nodemon": "^3.0.1",
         "pm2": "^5.3.0",
-        "ytdl-core": "https://github.com/VishwaiOSDev/ytdl-core.git"
+        "ytdl-core": "^4.11.5"
     }
 }
