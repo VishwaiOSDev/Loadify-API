@@ -1,0 +1,837 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/><title>Loadify</title><style>
+/* cspell:disable-file */
+/* webkit printing magic: print all background colors */
+html {
+	-webkit-print-color-adjust: exact;
+}
+* {
+	box-sizing: border-box;
+	-webkit-print-color-adjust: exact;
+}
+
+html,
+body {
+	margin: 0;
+	padding: 0;
+}
+@media only screen {
+	body {
+		margin: 2em auto;
+		max-width: 900px;
+		color: rgb(55, 53, 47);
+	}
+}
+
+body {
+	line-height: 1.5;
+	white-space: pre-wrap;
+}
+
+a,
+a.visited {
+	color: inherit;
+	text-decoration: underline;
+}
+
+.pdf-relative-link-path {
+	font-size: 80%;
+	color: #444;
+}
+
+h1,
+h2,
+h3 {
+	letter-spacing: -0.01em;
+	line-height: 1.2;
+	font-weight: 600;
+	margin-bottom: 0;
+}
+
+.page-title {
+	font-size: 2.5rem;
+	font-weight: 700;
+	margin-top: 0;
+	margin-bottom: 0.75em;
+}
+
+h1 {
+	font-size: 1.875rem;
+	margin-top: 1.875rem;
+}
+
+h2 {
+	font-size: 1.5rem;
+	margin-top: 1.5rem;
+}
+
+h3 {
+	font-size: 1.25rem;
+	margin-top: 1.25rem;
+}
+
+.source {
+	border: 1px solid #ddd;
+	border-radius: 3px;
+	padding: 1.5em;
+	word-break: break-all;
+}
+
+.callout {
+	border-radius: 3px;
+	padding: 1rem;
+}
+
+figure {
+	margin: 1.25em 0;
+	page-break-inside: avoid;
+}
+
+figcaption {
+	opacity: 0.5;
+	font-size: 85%;
+	margin-top: 0.5em;
+}
+
+mark {
+	background-color: transparent;
+}
+
+.indented {
+	padding-left: 1.5em;
+}
+
+hr {
+	background: transparent;
+	display: block;
+	width: 100%;
+	height: 1px;
+	visibility: visible;
+	border: none;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+img {
+	max-width: 100%;
+}
+
+@media only print {
+	img {
+		max-height: 100vh;
+		object-fit: contain;
+	}
+}
+
+@page {
+	margin: 1in;
+}
+
+.collection-content {
+	font-size: 0.875rem;
+}
+
+.column-list {
+	display: flex;
+	justify-content: space-between;
+}
+
+.column {
+	padding: 0 1em;
+}
+
+.column:first-child {
+	padding-left: 0;
+}
+
+.column:last-child {
+	padding-right: 0;
+}
+
+.table_of_contents-item {
+	display: block;
+	font-size: 0.875rem;
+	line-height: 1.3;
+	padding: 0.125rem;
+}
+
+.table_of_contents-indent-1 {
+	margin-left: 1.5rem;
+}
+
+.table_of_contents-indent-2 {
+	margin-left: 3rem;
+}
+
+.table_of_contents-indent-3 {
+	margin-left: 4.5rem;
+}
+
+.table_of_contents-link {
+	text-decoration: none;
+	opacity: 0.7;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.18);
+}
+
+table,
+th,
+td {
+	border: 1px solid rgba(55, 53, 47, 0.09);
+	border-collapse: collapse;
+}
+
+table {
+	border-left: none;
+	border-right: none;
+}
+
+th,
+td {
+	font-weight: normal;
+	padding: 0.25em 0.5em;
+	line-height: 1.5;
+	min-height: 1.5em;
+	text-align: left;
+}
+
+th {
+	color: rgba(55, 53, 47, 0.6);
+}
+
+ol,
+ul {
+	margin: 0;
+	margin-block-start: 0.6em;
+	margin-block-end: 0.6em;
+}
+
+li > ol:first-child,
+li > ul:first-child {
+	margin-block-start: 0.6em;
+}
+
+ul > li {
+	list-style: disc;
+}
+
+ul.to-do-list {
+	padding-inline-start: 0;
+}
+
+ul.to-do-list > li {
+	list-style: none;
+}
+
+.to-do-children-checked {
+	text-decoration: line-through;
+	opacity: 0.375;
+}
+
+ul.toggle > li {
+	list-style: none;
+}
+
+ul {
+	padding-inline-start: 1.7em;
+}
+
+ul > li {
+	padding-left: 0.1em;
+}
+
+ol {
+	padding-inline-start: 1.6em;
+}
+
+ol > li {
+	padding-left: 0.2em;
+}
+
+.mono ol {
+	padding-inline-start: 2em;
+}
+
+.mono ol > li {
+	text-indent: -0.4em;
+}
+
+.toggle {
+	padding-inline-start: 0em;
+	list-style-type: none;
+}
+
+/* Indent toggle children */
+.toggle > li > details {
+	padding-left: 1.7em;
+}
+
+.toggle > li > details > summary {
+	margin-left: -1.1em;
+}
+
+.selected-value {
+	display: inline-block;
+	padding: 0 0.5em;
+	background: rgba(206, 205, 202, 0.5);
+	border-radius: 3px;
+	margin-right: 0.5em;
+	margin-top: 0.3em;
+	margin-bottom: 0.3em;
+	white-space: nowrap;
+}
+
+.collection-title {
+	display: inline-block;
+	margin-right: 1em;
+}
+
+.page-description {
+    margin-bottom: 2em;
+}
+
+.simple-table {
+	margin-top: 1em;
+	font-size: 0.875rem;
+	empty-cells: show;
+}
+.simple-table td {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table th {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table-header-color {
+	background: rgb(247, 246, 243);
+	color: black;
+}
+.simple-table-header {
+	font-weight: 500;
+}
+
+time {
+	opacity: 0.5;
+}
+
+.icon {
+	display: inline-block;
+	max-width: 1.2em;
+	max-height: 1.2em;
+	text-decoration: none;
+	vertical-align: text-bottom;
+	margin-right: 0.5em;
+}
+
+img.icon {
+	border-radius: 3px;
+}
+
+.user-icon {
+	width: 1.5em;
+	height: 1.5em;
+	border-radius: 100%;
+	margin-right: 0.5rem;
+}
+
+.user-icon-inner {
+	font-size: 0.8em;
+}
+
+.text-icon {
+	border: 1px solid #000;
+	text-align: center;
+}
+
+.page-cover-image {
+	display: block;
+	object-fit: cover;
+	width: 100%;
+	max-height: 30vh;
+}
+
+.page-header-icon {
+	font-size: 3rem;
+	margin-bottom: 1rem;
+}
+
+.page-header-icon-with-cover {
+	margin-top: -0.72em;
+	margin-left: 0.07em;
+}
+
+.page-header-icon img {
+	border-radius: 3px;
+}
+
+.link-to-page {
+	margin: 1em 0;
+	padding: 0;
+	border: none;
+	font-weight: 500;
+}
+
+p > .user {
+	opacity: 0.5;
+}
+
+td > .user,
+td > time {
+	white-space: nowrap;
+}
+
+input[type="checkbox"] {
+	transform: scale(1.5);
+	margin-right: 0.6em;
+	vertical-align: middle;
+}
+
+p {
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+}
+
+.image {
+	border: none;
+	margin: 1.5em 0;
+	padding: 0;
+	border-radius: 0;
+	text-align: center;
+}
+
+.code,
+code {
+	background: rgba(135, 131, 120, 0.15);
+	border-radius: 3px;
+	padding: 0.2em 0.4em;
+	border-radius: 3px;
+	font-size: 100%;
+	tab-size: 2;
+}
+
+code {
+	color: #eb5757;
+}
+
+.code {
+	padding: 1.5em 1em;
+}
+
+.code-wrap {
+	white-space: pre-wrap;
+	word-break: break-all;
+}
+
+.code > code {
+	background: none;
+	padding: 0;
+	font-size: 100%;
+	color: inherit;
+}
+
+blockquote {
+	font-size: 1.25em;
+	margin: 1em 0;
+	padding-left: 1em;
+	border-left: 3px solid rgb(55, 53, 47);
+}
+
+.bookmark {
+	text-decoration: none;
+	max-height: 8em;
+	padding: 0;
+	display: flex;
+	width: 100%;
+	align-items: stretch;
+}
+
+.bookmark-title {
+	font-size: 0.85em;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	height: 1.75em;
+	white-space: nowrap;
+}
+
+.bookmark-text {
+	display: flex;
+	flex-direction: column;
+}
+
+.bookmark-info {
+	flex: 4 1 180px;
+	padding: 12px 14px 14px;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+}
+
+.bookmark-image {
+	width: 33%;
+	flex: 1 1 180px;
+	display: block;
+	position: relative;
+	object-fit: cover;
+	border-radius: 1px;
+}
+
+.bookmark-description {
+	color: rgba(55, 53, 47, 0.6);
+	font-size: 0.75em;
+	overflow: hidden;
+	max-height: 4.5em;
+	word-break: break-word;
+}
+
+.bookmark-href {
+	font-size: 0.75em;
+	margin-top: 0.25em;
+}
+
+.sans { font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"; }
+.code { font-family: "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace; }
+.serif { font-family: Lyon-Text, Georgia, ui-serif, serif; }
+.mono { font-family: iawriter-mono, Nitti, Menlo, Courier, monospace; }
+.pdf .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK JP'; }
+.pdf:lang(zh-CN) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK SC'; }
+.pdf:lang(zh-TW) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK TC'; }
+.pdf:lang(ko-KR) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK KR'; }
+.pdf .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.pdf .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK JP'; }
+.pdf:lang(zh-CN) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK SC'; }
+.pdf:lang(zh-TW) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK TC'; }
+.pdf:lang(ko-KR) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK KR'; }
+.pdf .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.highlight-default {
+	color: rgba(55, 53, 47, 1);
+}
+.highlight-gray {
+	color: rgba(120, 119, 116, 1);
+	fill: rgba(120, 119, 116, 1);
+}
+.highlight-brown {
+	color: rgba(159, 107, 83, 1);
+	fill: rgba(159, 107, 83, 1);
+}
+.highlight-orange {
+	color: rgba(217, 115, 13, 1);
+	fill: rgba(217, 115, 13, 1);
+}
+.highlight-yellow {
+	color: rgba(203, 145, 47, 1);
+	fill: rgba(203, 145, 47, 1);
+}
+.highlight-teal {
+	color: rgba(68, 131, 97, 1);
+	fill: rgba(68, 131, 97, 1);
+}
+.highlight-blue {
+	color: rgba(51, 126, 169, 1);
+	fill: rgba(51, 126, 169, 1);
+}
+.highlight-purple {
+	color: rgba(144, 101, 176, 1);
+	fill: rgba(144, 101, 176, 1);
+}
+.highlight-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.highlight-red {
+	color: rgba(212, 76, 71, 1);
+	fill: rgba(212, 76, 71, 1);
+}
+.highlight-gray_background {
+	background: rgba(241, 241, 239, 1);
+}
+.highlight-brown_background {
+	background: rgba(244, 238, 238, 1);
+}
+.highlight-orange_background {
+	background: rgba(251, 236, 221, 1);
+}
+.highlight-yellow_background {
+	background: rgba(251, 243, 219, 1);
+}
+.highlight-teal_background {
+	background: rgba(237, 243, 236, 1);
+}
+.highlight-blue_background {
+	background: rgba(231, 243, 248, 1);
+}
+.highlight-purple_background {
+	background: rgba(244, 240, 247, 0.8);
+}
+.highlight-pink_background {
+	background: rgba(249, 238, 243, 0.8);
+}
+.highlight-red_background {
+	background: rgba(253, 235, 236, 1);
+}
+.block-color-default {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray {
+	color: rgba(120, 119, 116, 1);
+	fill: rgba(120, 119, 116, 1);
+}
+.block-color-brown {
+	color: rgba(159, 107, 83, 1);
+	fill: rgba(159, 107, 83, 1);
+}
+.block-color-orange {
+	color: rgba(217, 115, 13, 1);
+	fill: rgba(217, 115, 13, 1);
+}
+.block-color-yellow {
+	color: rgba(203, 145, 47, 1);
+	fill: rgba(203, 145, 47, 1);
+}
+.block-color-teal {
+	color: rgba(68, 131, 97, 1);
+	fill: rgba(68, 131, 97, 1);
+}
+.block-color-blue {
+	color: rgba(51, 126, 169, 1);
+	fill: rgba(51, 126, 169, 1);
+}
+.block-color-purple {
+	color: rgba(144, 101, 176, 1);
+	fill: rgba(144, 101, 176, 1);
+}
+.block-color-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.block-color-red {
+	color: rgba(212, 76, 71, 1);
+	fill: rgba(212, 76, 71, 1);
+}
+.block-color-gray_background {
+	background: rgba(241, 241, 239, 1);
+}
+.block-color-brown_background {
+	background: rgba(244, 238, 238, 1);
+}
+.block-color-orange_background {
+	background: rgba(251, 236, 221, 1);
+}
+.block-color-yellow_background {
+	background: rgba(251, 243, 219, 1);
+}
+.block-color-teal_background {
+	background: rgba(237, 243, 236, 1);
+}
+.block-color-blue_background {
+	background: rgba(231, 243, 248, 1);
+}
+.block-color-purple_background {
+	background: rgba(244, 240, 247, 0.8);
+}
+.block-color-pink_background {
+	background: rgba(249, 238, 243, 0.8);
+}
+.block-color-red_background {
+	background: rgba(253, 235, 236, 1);
+}
+.select-value-color-uiBlue { background-color: rgba(35, 131, 226, .07); }
+.select-value-color-pink { background-color: rgba(245, 224, 233, 1); }
+.select-value-color-purple { background-color: rgba(232, 222, 238, 1); }
+.select-value-color-green { background-color: rgba(219, 237, 219, 1); }
+.select-value-color-gray { background-color: rgba(227, 226, 224, 1); }
+.select-value-color-translucentGray { background-color: rgba(255, 255, 255, 0.0375); }
+.select-value-color-orange { background-color: rgba(250, 222, 201, 1); }
+.select-value-color-brown { background-color: rgba(238, 224, 218, 1); }
+.select-value-color-red { background-color: rgba(255, 226, 221, 1); }
+.select-value-color-yellow { background-color: rgba(253, 236, 200, 1); }
+.select-value-color-blue { background-color: rgba(211, 229, 239, 1); }
+.select-value-color-pageGlass { background-color: undefined; }
+.select-value-color-washGlass { background-color: undefined; }
+
+.checkbox {
+	display: inline-flex;
+	vertical-align: text-bottom;
+	width: 16;
+	height: 16;
+	background-size: 16px;
+	margin-left: 2px;
+	margin-right: 5px;
+}
+
+.checkbox-on {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20width%3D%2216%22%20height%3D%2216%22%20fill%3D%22%2358A9D7%22%2F%3E%0A%3Cpath%20d%3D%22M6.71429%2012.2852L14%204.9995L12.7143%203.71436L6.71429%209.71378L3.28571%206.2831L2%207.57092L6.71429%2012.2852Z%22%20fill%3D%22white%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+
+.checkbox-off {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20x%3D%220.75%22%20y%3D%220.75%22%20width%3D%2214.5%22%20height%3D%2214.5%22%20fill%3D%22white%22%20stroke%3D%22%2336352F%22%20stroke-width%3D%221.5%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+	
+</style></head><body><article id="355a7be3-5091-49e6-8bbc-6b2a4eab88c6" class="page sans"><header><img class="page-cover-image" src="assets/loadify_cover.png" style="object-position:center 50%"/><h1 class="page-title">Loadify</h1><p class="page-description"></p></header><div class="page-body"><h2 id="e78f1ec8-f45c-4d34-ab34-d5dd5c3c3b98" class="">Description</h2><p id="74115adf-24aa-43f5-959e-f100fc6fed3c" class="">Loadify is an iOS and iPad app designed for downloading high-quality content from YouTube, including videos and shorts, as well as Instagram reels and posts.</p><h2 id="c03eaa9d-e2a1-4813-9476-19aca53b26dc" class="">Base URL</h2><p id="6946853d-1520-4fc4-ad97-b2e6dd43d765" class="">The base URL for all API requests is:</p><p id="441e7579-2c00-4377-82e0-da2332bb74e3" class=""><code>https://loadify.madrasvalley.com/api</code></p><h2 id="3052c04c-e566-491d-b09a-f9c7a592013f" class="">Endpoints</h2><h3 id="9adeb811-23fd-44c6-a0d8-4c1a1c4f9c15" class="">YouTube</h3><ul id="176e163c-40cf-4980-88e4-78385e62b0aa" class="toggle"><li><details open=""><summary><strong><code>[GET]</code></strong> <strong>Listing YouTube Video Details</strong></summary><h3 id="b54496ad-764a-4bea-ac30-426e49937cbd" class=""><code>GET /yt/details</code></h3><p id="0aaf0f4c-e4d6-4adb-b313-76164bffdb65" class="">Provides details about a YouTube video.</p><h3 id="731dd237-bf4f-48fa-8c6b-b63d17477787" class="">Parameters</h3><table id="4b469bf5-f8d9-4ef2-ba95-ed2c8d7a4f70" class="simple-table"><tbody><tr id="3d2c4e22-034f-4c6f-9be3-dc48785dfa6a"><td id="jVX`" class="">Parameter</td><td id="K&lt;~[" class="">Type</td><td id="eA?V" class="">Requirement</td><td id="CByl" class="">Description</td></tr><tr id="9cd54a9d-bda0-4522-84cc-fd38470797d4"><td id="jVX`" class=""><code>url</code></td><td id="K&lt;~[" class="">String</td><td id="eA?V" class="">Required</td><td id="CByl" class="">The URL of the YouTube video</td></tr></tbody></table><h3 id="df16e0cf-a6b2-4f06-8f5a-abf1a0817dcb" class="">Response</h3><p id="bec7b425-c569-446d-8897-25ebf8e6cc6f" class="">Returns a JSON object with following properties:</p><ul id="bd0597e8-846b-41e6-b205-0739e6b4fed7" class="bulleted-list"><li style="list-style-type:disc"><code><strong>title</strong></code> (String): Title of the YouTube video.</li></ul><ul id="b066aaf8-0c97-4c02-8317-74071a0a3b6a" class="bulleted-list"><li style="list-style-type:disc"><code><strong>description</strong></code> (String): Description of the YouTube video content.</li></ul><ul id="f99a5fe5-8648-4b70-9088-683bdb3fb963" class="bulleted-list"><li style="list-style-type:disc"><code><strong>lengthSeconds</strong></code> (Integer): Duration of the video in seconds.</li></ul><ul id="98ee2b2a-d308-4e69-bc14-eee3df6d8b30" class="bulleted-list"><li style="list-style-type:disc"><code><strong>viewCount</strong></code> (Integer): Number of views the video has received.</li></ul><ul id="19a4747d-4ce2-4d5c-8e33-217c86d87fe1" class="bulleted-list"><li style="list-style-type:disc"><code><strong>publishDate</strong></code> (String - ISO 8601 format): Date and time when the video was published.</li></ul><ul id="186c4cbf-a718-4b5a-b3f0-4d35a8380d4e" class="bulleted-list"><li style="list-style-type:disc"><code><strong>ownerChannelName</strong></code> (String): Name of the YouTube channel that owns the video.</li></ul><ul id="36134113-f70d-4267-9143-914433796c3f" class="bulleted-list"><li style="list-style-type:disc"><code><strong>videoId</strong></code> (String): Unique identifier for the video.</li></ul><ul id="29546e0a-5440-44fa-a8c4-79eb195ecc84" class="bulleted-list"><li style="list-style-type:disc"><code><strong>author</strong></code> (Object): Information about the video&#x27;s author.<ul id="41866afe-759a-445c-9462-06e69187f5f4" class="bulleted-list"><li style="list-style-type:circle"><code><strong>id</strong></code> (String): Author&#x27;s unique identifier.</li></ul><ul id="57292d22-d568-4155-b658-a4ad8ce8f5c4" class="bulleted-list"><li style="list-style-type:circle"><code><strong>name</strong></code> (String): Author&#x27;s name.</li></ul><ul id="b7b999f9-7b5a-4f44-a451-2bbf57aa0cc3" class="bulleted-list"><li style="list-style-type:circle"><code><strong>user</strong></code> (String): Author&#x27;s username.</li></ul><ul id="375a22ec-3dfa-422a-a86e-b1998ec73677" class="bulleted-list"><li style="list-style-type:circle"><code><strong>channel_url</strong></code> (String): URL of the author&#x27;s YouTube channel.</li></ul><ul id="8f235634-ce5d-4b25-a7ea-0e86fb119116" class="bulleted-list"><li style="list-style-type:circle"><code><strong>verified</strong></code> (Boolean): Verification status of the author&#x27;s channel.</li></ul><ul id="bd2b46a2-e78c-46d3-be6a-4523b68d107e" class="bulleted-list"><li style="list-style-type:circle"><code><strong>subscriber_count</strong></code> (Integer): Number of subscribers to the author&#x27;s channel.</li></ul></li></ul><ul id="6e45b721-933a-43bd-a98a-bf980b4afede" class="bulleted-list"><li style="list-style-type:disc"><code><strong>likes</strong></code> (Integer): Number of likes the video has received.</li></ul><ul id="07229d6c-fa43-4057-a3ad-7c7396b622d5" class="bulleted-list"><li style="list-style-type:disc"><code><strong>video_url</strong></code> (String): URL link to the YouTube video.</li></ul><ul id="82e95809-fe08-4aae-b7b3-315e94b54b8d" class="bulleted-list"><li style="list-style-type:disc"><code><strong>thumbnails</strong></code> (Array): Array of thumbnail objects.<ul id="91fbb383-5a73-422f-8a0b-8f329a276adf" class="bulleted-list"><li style="list-style-type:circle"><code><strong>url</strong></code> (String): URL of the thumbnail image.</li></ul><ul id="d033e0da-6509-4477-b304-e51e72d03e10" class="bulleted-list"><li style="list-style-type:circle"><code><strong>width</strong></code> (Integer): Width of the thumbnail image.</li></ul><ul id="93b8a166-cd71-48b7-8671-fcd04ed51b8a" class="bulleted-list"><li style="list-style-type:circle"><code><strong>height</strong></code> (Integer): Height of the thumbnail image.</li></ul></li></ul><h3 id="675dfa57-0677-4a49-a913-5d234c0c76dd" class="">Example</h3><p id="96ddce25-db18-47a2-ad12-38cd5c7ea3d7" class="">Request:</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="f7b9c88a-6025-4912-aed7-1ac869beb5c1" class="code"><code class="language-Plain Text">GET yt/details?url=https://youtu.be/G4sYQSwgvNI?si=oe45uQy6YQKIy3Du</code></pre><p id="3cd7cede-b88a-4589-aece-0ff47255a9ea" class="">Response:</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="fd3597df-7d8e-4afe-8b09-d80c92aa27cf" class="code"><code class="language-JSON">{
+    &quot;title&quot;: &quot;$2.5 Ramen at HIDAKAYA in Ginza Tokyo&quot;,
+    &quot;description&quot;: &quot;Trying the cheapest ramen available at the ramen chain HIDAKAYA in Ginza Tokyo, Japan,\n\nHIDAKAYA has almost 200 stores just in Tokyo, so it&#x27;s easy to find.&quot;,
+    &quot;lengthSeconds&quot;: &quot;1933&quot;,
+    &quot;viewCount&quot;: &quot;454&quot;,
+    &quot;publishDate&quot;: &quot;2023-12-16T13:00:11-08:00&quot;,
+    &quot;ownerChannelName&quot;: &quot;Ichiban Yummy Japan&quot;,
+    &quot;videoId&quot;: &quot;G4sYQSwgvNI&quot;,
+    &quot;author&quot;: {
+        &quot;id&quot;: &quot;UCSMnDlBpdsYsisNDD_VofAg&quot;,
+        &quot;name&quot;: &quot;Ichiban Yummy Japan&quot;,
+        &quot;user&quot;: &quot;@IchibanYummyJapan&quot;,
+        &quot;channel_url&quot;: &quot;https://www.youtube.com/channel/UCSMnDlBpdsYsisNDD_VofAg&quot;,
+        &quot;external_channel_url&quot;: &quot;https://www.youtube.com/channel/UCSMnDlBpdsYsisNDD_VofAg&quot;,
+        &quot;user_url&quot;: &quot;http://www.youtube.com/@IchibanYummyJapan&quot;,
+        &quot;thumbnails&quot;: [
+            {
+                &quot;url&quot;: &quot;https://yt3.ggpht.com/6yBpCeQ4A3fDKmkKzkgS5HizfpOXhO_-rC2h-ugoroVHaPUTQHqxliWsCjlBMQmpl-Jyj5_Rxw=s48-c-k-c0x00ffffff-no-rj&quot;,
+                &quot;width&quot;: 48,
+                &quot;height&quot;: 48
+            },
+            {
+                &quot;url&quot;: &quot;https://yt3.ggpht.com/6yBpCeQ4A3fDKmkKzkgS5HizfpOXhO_-rC2h-ugoroVHaPUTQHqxliWsCjlBMQmpl-Jyj5_Rxw=s88-c-k-c0x00ffffff-no-rj&quot;,
+                &quot;width&quot;: 88,
+                &quot;height&quot;: 88
+            },
+            {
+                &quot;url&quot;: &quot;https://yt3.ggpht.com/6yBpCeQ4A3fDKmkKzkgS5HizfpOXhO_-rC2h-ugoroVHaPUTQHqxliWsCjlBMQmpl-Jyj5_Rxw=s176-c-k-c0x00ffffff-no-rj&quot;,
+                &quot;width&quot;: 176,
+                &quot;height&quot;: 176
+            }
+        ],
+        &quot;verified&quot;: false,
+        &quot;subscriber_count&quot;: 574
+    },
+    &quot;likes&quot;: null,
+    &quot;video_url&quot;: &quot;https://www.youtube.com/watch?v=G4sYQSwgvNI&quot;,
+    &quot;thumbnails&quot;: [
+        {
+            &quot;url&quot;: &quot;https://i.ytimg.com/vi/G4sYQSwgvNI/hqdefault.jpg?sqp=-oaymwEbCKgBEF5IVfKriqkDDggBFQAAiEIYAXABwAEG&amp;rs=AOn4CLBpPiIJjfrYZZAnMNkAMoCudxx3ew&quot;,
+            &quot;width&quot;: 168,
+            &quot;height&quot;: 94
+        },
+        {
+            &quot;url&quot;: &quot;https://i.ytimg.com/vi/G4sYQSwgvNI/hqdefault.jpg?sqp=-oaymwEbCMQBEG5IVfKriqkDDggBFQAAiEIYAXABwAEG&amp;rs=AOn4CLAUFnuDX_lTr6aEiN8aIIO2Ltcqrg&quot;,
+            &quot;width&quot;: 196,
+            &quot;height&quot;: 110
+        },
+        {
+            &quot;url&quot;: &quot;https://i.ytimg.com/vi/G4sYQSwgvNI/hqdefault.jpg?sqp=-oaymwEcCPYBEIoBSFXyq4qpAw4IARUAAIhCGAFwAcABBg==&amp;rs=AOn4CLD78WUg99VbQZbZKZHsqqRmOIZ0rg&quot;,
+            &quot;width&quot;: 246,
+            &quot;height&quot;: 138
+        },
+        {
+            &quot;url&quot;: &quot;https://i.ytimg.com/vi/G4sYQSwgvNI/hqdefault.jpg?sqp=-oaymwEcCNACELwBSFXyq4qpAw4IARUAAIhCGAFwAcABBg==&amp;rs=AOn4CLBISvWvGh60RIZ05nQ5EJf0aXkHKw&quot;,
+            &quot;width&quot;: 336,
+            &quot;height&quot;: 188
+        }
+    ]
+}</code></pre><p id="e13c0b86-f10c-448a-b26a-f9f925aa20e6" class="">
+</p><h3 id="726f4460-f0ee-4ec4-b247-f5f7628dae78" class="">Errors</h3><p id="fc4444f3-8a96-4e3d-9e2f-87279a1e2b4e" class="">This API uses the following error codes:</p><ul id="dd3459c8-e762-4935-80fe-3475547339c5" class="bulleted-list"><li style="list-style-type:disc"><code>400 Bad Request</code>: The request was malformed or missing required parameters.</li></ul><ul id="4e0558bd-ed5b-4d6e-9f61-77bdde124cad" class="bulleted-list"><li style="list-style-type:disc"><code>401 Unauthorized</code>: The API Key provided was invalid or missing.</li></ul><ul id="38bf5875-fe40-4ecc-8bfb-ccefce83d154" class="bulleted-list"><li style="list-style-type:disc"><code>404 Not Found</code>: The requested resource was not found.</li></ul><ul id="5e8248a6-49d0-400b-9a15-5d0eebc111dd" class="bulleted-list"><li style="list-style-type:disc"><code>500 Internal Server Error</code>: An unexpected error occurred on the server. </li></ul></details></li></ul><ul id="e2d00896-ef59-4d0e-aa2c-f2eb65bffff3" class="toggle"><li><details open=""><summary><strong><code>[GET]</code></strong><strong> Download YouTube Video</strong></summary><h3 id="075cb1f2-fe14-4cb0-9bc9-8b7deea418cc" class=""><code>GET /yt/download/video/mp4</code> </h3><p id="95c3fba4-3b02-4d22-9d3a-360d0a245b13" class="">Downloads mp4 files of the requested YouTube video.</p><h3 id="a073703a-ca49-4019-a632-6d239b0cd505" class="">Parameters</h3><table id="2faf7962-7d39-47a0-9168-608c5efab1f1" class="simple-table"><tbody><tr id="5d50b4ea-1ddd-4c91-b15a-1504075a99d5"><td id="cPhn" class="">Parameter</td><td id="UuEe" class="">Type</td><td id="|AzK" class="">Requirement</td><td id="c^Dy" class="">Description</td></tr><tr id="cacf2632-f43f-405a-ae63-c898706586b9"><td id="cPhn" class="">url</td><td id="UuEe" class="">String </td><td id="|AzK" class="">Required </td><td id="c^Dy" class="">The url of the YouTube video</td></tr><tr id="e39e37e1-5ae2-407a-96f9-27f016f8235a"><td id="cPhn" class="">video_quality</td><td id="UuEe" class="">String</td><td id="|AzK" class="">Required</td><td id="c^Dy" class="">The quality of the video. Available values are <code>Low</code>, <code>Medium</code>, <code>High</code></td></tr></tbody></table><h3 id="0c07fc44-5494-4e75-b385-55977a4eff2b" class="">Response</h3><p id="17bb17f6-7069-42d2-aee5-1954172557f4" class="">Returns a attachment of mp4 <code>video/mp4</code></p><h3 id="7cca7446-a1de-43f8-92ed-2938f7b51a63" class="">Example</h3><p id="489d5b49-1019-42b9-aef2-fa5b012e9b5e" class="">Request:</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="3e8f8e1c-07af-4353-8611-62611ae1f623" class="code"><code class="language-Plain Text">GET /yt/download/video/mp4?url=https://www.youtube.com/watch?v=fSuZrDcUtts&amp;video_quality=High</code></pre><p id="9c2cc12b-57aa-4aa1-b93e-e30480f9bad9" class="">Response:</p><figure id="e466f265-a49a-4313-8b58-4338c31a86d3" class="image"><a href="assets/download_response.png"><img style="width:2184px" src="assets/download_response.png"/></a></figure><h3 id="715698b5-6e70-4dac-89da-6cc43ddccdc0" class="">Errors</h3><p id="ad430465-92c3-4459-a709-be921102e0c9" class="">This API uses the following error codes:</p><ul id="812dc704-0940-4b2a-814d-c7baca56c61b" class="bulleted-list"><li style="list-style-type:disc"><code>400 Bad Request</code>: The request was malformed or missing required parameters.</li></ul><ul id="d77ebcdb-f284-482c-ba53-7cd47fdf3684" class="bulleted-list"><li style="list-style-type:disc"><code>401 Unauthorized</code>: The API Key provided was invalid or missing.</li></ul><ul id="e66bcf5a-42be-4f00-8ae7-dbafe8d4c58d" class="bulleted-list"><li style="list-style-type:disc"><code>404 Not Found</code>: The requested resource was not found.</li></ul><ul id="481d92a2-0096-4f33-8834-ce2648327285" class="bulleted-list"><li style="list-style-type:disc"><code>500 Internal Server Error</code>: An unexpected error occurred on the server. </li></ul></details></li></ul><h3 id="5f3ad262-b218-4e32-8898-e1b0184262eb" class="">Instagram</h3><ul id="fbfde1e2-efa4-4b4b-958f-0fcf5bfee9a7" class="toggle"><li><details open=""><summary><strong><code>[GET]</code></strong><strong> Listing and Download Instagram Video Details</strong></summary><h3 id="4e784f78-45de-4b2d-9ad5-94796e7fc952" class=""><code>GET /ig/details</code></h3><p id="3ecc3880-baf4-4732-bf5c-ef195625690d" class="">Provides details about a Instagram reels and post.</p><h3 id="5fbe1bb0-3171-4c89-a4ac-c409586f4cda" class="">Parameters</h3><table id="22d0de99-0126-4ce7-9935-7a281a0ce1a9" class="simple-table"><tbody><tr id="d91b1577-9417-42d6-88ee-a818e023c2ab"><td id="cPhn" class="">Parameter</td><td id="UuEe" class="">Type</td><td id="|AzK" class="">Requirement</td><td id="c^Dy" class="">Description</td></tr><tr id="a4f19080-7641-403e-b455-264c152959d5"><td id="cPhn" class="">url</td><td id="UuEe" class="">String</td><td id="|AzK" class="">Required</td><td id="c^Dy" class="">The URL of the Instagram reels or posts</td></tr></tbody></table><h3 id="581b342f-78dd-4c66-9628-20d21fa771fe" class="">Response</h3><p id="c60f06cd-685a-495f-9b43-4b75125f284c" class="">Returns a array of JSON object with following properties:</p><ul id="98107184-529f-4643-b6f7-4d84bd3dd7bc" class="bulleted-list"><li style="list-style-type:disc"><strong><code>thumbnail_link</code></strong><strong> </strong>(String): Represents a preview image of the first Instagram post. </li></ul><ul id="e3a66589-24f4-4bcb-b953-44648d6c32d9" class="bulleted-list"><li style="list-style-type:disc"><strong><code>download_link</code></strong><strong> </strong>(String): Provides a link to download the full-size version of the first Instagram post image.</li></ul><p id="36a7ec77-6b03-4a4a-8c01-ec311a6bceed" class="">In the response, you will receive an array of JSON objects, each containing <code>thumbnail_link</code> and <code>download_link</code> for an individual Instagram post.</p><h3 id="95d678b6-2638-493e-897c-5d9b1d4b9ae5" class="">Example</h3><p id="8d9079b0-c071-4047-8e79-0715273a49e4" class="">Request:</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="7bb42f51-5f13-4965-9a01-27d43142f118" class="code"><code class="language-Plain Text">GET ig/detail?url=https://www.instagram.com/p/Cyyc_5up_kX/?igsh=a25rdndtOGM1Z3Qw</code></pre><p id="a5f5d266-4528-4fb9-a44a-b8c2d9f66678" class="">Response:</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="aa94e59f-6c05-4ae7-afc3-ef2e16f917e6" class="code"><code class="language-JSON">[
+    {
+        &quot;thumbnail_link&quot;: &quot;https://igcdn.xyz/?token=1a9723145ec92e5a8e41158774138fe66009291f2d9171e53a769032f2082f33&amp;time=1705345821&amp;file=https%3a%2f%2fscontent.cdninstagram.com%2fv%2ft51.2885-15%2f394656116_638816911756620_2320688565392617743_n.webp%3fse%3d7%26stp%3ddst-jpg_e35%26_nc_ht%3dscontent-lga3-2.cdninstagram.com%26_nc_cat%3d100%26_nc_ohc%3dq130NIOFow0AX9rLd7a%26edm%3dAP_V10EBAAAA%26ccb%3d7-5%26ig_cache_key%3dMzIyMDc2NDIxMzUxOTk1NjA1Mw%253D%253D.2-ccb7-5%26oh%3d00_AfDEqhql21JcNQ7b9B0RLLwI_KcMjhW61Kukql1hQNIaNQ%26oe%3d65AB375E%26_nc_sid%3d2999b8&quot;,
+        &quot;download_link&quot;: &quot;https://scontent.cdninstagram.com/v/t51.2885-15/394656116_638816911756620_2320688565392617743_n.webp?se=7&amp;stp=dst-jpg_e35&amp;efg=eyJ2ZW5jb2RlX3RhZyI6ImltYWdlX3VybGdlbi4xMDgweDEwODAuc2RyIn0&amp;_nc_ht=scontent-lga3-2.cdninstagram.com&amp;_nc_cat=100&amp;_nc_ohc=q130NIOFow0AX9rLd7a&amp;edm=AP_V10EBAAAA&amp;ccb=7-5&amp;oh=00_AfDEqhql21JcNQ7b9B0RLLwI_KcMjhW61Kukql1hQNIaNQ&amp;oe=65AB375E&amp;_nc_sid=2999b8&amp;dl=1&quot;
+    },
+    {
+        &quot;thumbnail_link&quot;: &quot;https://igcdn.xyz/?token=1a9723145ec92e5a8e41158774138fe66009291f2d9171e53a769032f2082f33&amp;time=1705345821&amp;file=https%3a%2f%2fscontent.cdninstagram.com%2fv%2ft51.2885-15%2f394789271_319980367336339_5204801715955802932_n.webp%3fse%3d7%26stp%3ddst-jpg_e35%26_nc_ht%3dscontent-lga3-2.cdninstagram.com%26_nc_cat%3d107%26_nc_ohc%3dy7HpOtcnRv4AX8RZwKE%26edm%3dAP_V10EBAAAA%26ccb%3d7-5%26ig_cache_key%3dMzIyMDc2NDIxMzUyODM1MDUyOA%253D%253D.2-ccb7-5%26oh%3d00_AfB15xOEWY5D1GXu8Vchtd-LoXpBFBCO49d_hrAG0x-IpQ%26oe%3d65AB34FD%26_nc_sid%3d2999b8&quot;,
+        &quot;download_link&quot;: &quot;https://scontent.cdninstagram.com/v/t51.2885-15/394789271_319980367336339_5204801715955802932_n.webp?se=7&amp;stp=dst-jpg_e35&amp;efg=eyJ2ZW5jb2RlX3RhZyI6ImltYWdlX3VybGdlbi4xMDgweDEwODAuc2RyIn0&amp;_nc_ht=scontent-lga3-2.cdninstagram.com&amp;_nc_cat=107&amp;_nc_ohc=y7HpOtcnRv4AX8RZwKE&amp;edm=AP_V10EBAAAA&amp;ccb=7-5&amp;oh=00_AfB15xOEWY5D1GXu8Vchtd-LoXpBFBCO49d_hrAG0x-IpQ&amp;oe=65AB34FD&amp;_nc_sid=2999b8&amp;dl=1&quot;
+    },
+    {
+        &quot;thumbnail_link&quot;: &quot;https://igcdn.xyz/?token=1a9723145ec92e5a8e41158774138fe66009291f2d9171e53a769032f2082f33&amp;time=1705345821&amp;file=https%3a%2f%2fscontent.cdninstagram.com%2fv%2ft51.2885-15%2f395017474_1330220791188448_2814875066653210021_n.webp%3fse%3d7%26stp%3ddst-jpg_e35%26efg%3de30%26_nc_ht%3dscontent-lga3-2.cdninstagram.com%26_nc_cat%3d104%26_nc_ohc%3dZdmClH2zVHkAX9jEYL5%26edm%3dAP_V10EBAAAA%26ccb%3d7-5%26ig_cache_key%3dMzIyMDc2NDIxMzUxMTcwMzgzOA%253D%253D.2-ccb7-5%26oh%3d00_AfD2rumwC9MhjEh_IMLI11zMmZI-1hHwAfCDcxC5arMfCw%26oe%3d65AA9DB6%26_nc_sid%3d2999b8&quot;,
+        &quot;download_link&quot;: &quot;https://scontent.cdninstagram.com/v/t51.2885-15/395017474_1330220791188448_2814875066653210021_n.webp?se=7&amp;stp=dst-jpg_e35&amp;efg=eyJ2ZW5jb2RlX3RhZyI6ImltYWdlX3VybGdlbi4xMDgweDEwODAuc2RyIn0&amp;_nc_ht=scontent-lga3-2.cdninstagram.com&amp;_nc_cat=104&amp;_nc_ohc=ZdmClH2zVHkAX9jEYL5&amp;edm=AP_V10EBAAAA&amp;ccb=7-5&amp;oh=00_AfD2rumwC9MhjEh_IMLI11zMmZI-1hHwAfCDcxC5arMfCw&amp;oe=65AA9DB6&amp;_nc_sid=2999b8&amp;dl=1&quot;
+    },
+    {
+        &quot;thumbnail_link&quot;: &quot;/imgs/loader.gif&quot;,
+        &quot;download_link&quot;: &quot;https://scontent.cdninstagram.com/v/t51.2885-15/394597993_875673573626405_8427018133253756310_n.webp?se=7&amp;stp=dst-jpg_e35&amp;efg=eyJ2ZW5jb2RlX3RhZyI6ImltYWdlX3VybGdlbi4xMDgweDEwODAuc2RyIn0&amp;_nc_ht=scontent-lga3-2.cdninstagram.com&amp;_nc_cat=105&amp;_nc_ohc=4Ko5C3ecUagAX8wU7hu&amp;edm=AP_V10EBAAAA&amp;ccb=7-5&amp;oh=00_AfCpiV1L3cgAcWqRw1M99l0ZP0lsRBuD9_LeX7et6alOkA&amp;oe=65AA3587&amp;_nc_sid=2999b8&amp;dl=1&quot;
+    },
+    {
+        &quot;thumbnail_link&quot;: &quot;/imgs/loader.gif&quot;,
+        &quot;download_link&quot;: &quot;https://scontent.cdninstagram.com/v/t51.2885-15/395038539_6812181548828621_1378809138135419075_n.webp?se=7&amp;stp=dst-jpg_e35&amp;efg=eyJ2ZW5jb2RlX3RhZyI6ImltYWdlX3VybGdlbi4xMDgweDEwODAuc2RyIn0&amp;_nc_ht=scontent-lga3-2.cdninstagram.com&amp;_nc_cat=105&amp;_nc_ohc=H5Nbunv5wccAX_q55kz&amp;edm=AP_V10EBAAAA&amp;ccb=7-5&amp;oh=00_AfBnCY0gzfwa7nyl1LpY3KsAiqO7TtGhzv8yTD6h3rH4dA&amp;oe=65AA9C24&amp;_nc_sid=2999b8&amp;dl=1&quot;
+    },
+    {
+        &quot;thumbnail_link&quot;: &quot;/imgs/loader.gif&quot;,
+        &quot;download_link&quot;: &quot;https://scontent.cdninstagram.com/v/t51.2885-15/394655229_886561829807575_2071436554944899888_n.webp?se=7&amp;stp=dst-jpg_e35&amp;efg=eyJ2ZW5jb2RlX3RhZyI6ImltYWdlX3VybGdlbi4xMDgweDEwODAuc2RyIn0&amp;_nc_ht=scontent-lga3-2.cdninstagram.com&amp;_nc_cat=107&amp;_nc_ohc=W-6gXorEt-MAX9sUkCx&amp;edm=AP_V10EBAAAA&amp;ccb=7-5&amp;oh=00_AfBM-FdRnMAuBaCLJITurG8PP1uQiPKAvWZYvODjZgBh6w&amp;oe=65AA389D&amp;_nc_sid=2999b8&amp;dl=1&quot;
+    }
+]</code></pre><h3 id="f094cb4d-9f55-48b1-8dba-52d8d3d2faf8" class="">Errors</h3><p id="a57fb825-1933-44fc-99de-e2274f3604f2" class="">This API uses the following error codes:</p><ul id="9094c067-90ea-48a4-8c62-569fa0c84f70" class="bulleted-list"><li style="list-style-type:disc"><code>400 Bad Request</code>: The request was malformed or missing required parameters.</li></ul><ul id="3b06a39b-c650-4259-a939-daa2e7b7d83b" class="bulleted-list"><li style="list-style-type:disc"><code>401 Unauthorized</code>: The API Key provided was invalid or missing.</li></ul><ul id="ae89b42c-333d-4785-9fb7-bc931292b30d" class="bulleted-list"><li style="list-style-type:disc"><code>404 Not Found</code>: The requested resource was not found.</li></ul><ul id="00ddb903-39f3-4013-8952-36be620f4837" class="bulleted-list"><li style="list-style-type:disc"><code>500 Internal Server Error</code>: An unexpected error occurred on the server. </li></ul></details></li></ul><h3 id="6a04b133-ea65-4475-9871-5b6a1b498e28" class="">TikTok</h3><ul id="bd494940-4f5d-4efc-b8bc-67827e01e4a8" class="toggle"><li><details open=""><summary><strong><code>[GET]</code></strong><strong> Listing and Download TikTok Video Details</strong></summary><h3 id="a9156d51-4ca6-4241-bde5-337957f12116" class=""><code>GET /tk/details</code>  </h3><p id="7de3ffa3-0736-46d4-b005-084584cb1c99" class="">Provides details about a TikTok videos.</p><h3 id="82b147b7-227a-49fc-9111-902bb8692bac" class="">Parameters</h3><table id="fcec12db-450a-4da1-9685-726260c0bb01" class="simple-table"><tbody><tr id="731cfe0e-48db-4cf6-b40c-9fd2bc86d7bd"><td id="cPhn" class="">Parameter</td><td id="UuEe" class="">Type</td><td id="|AzK" class="">Requirement</td><td id="c^Dy" class="">Description</td></tr><tr id="167aafb9-8bef-4600-be89-1ceb299df70b"><td id="cPhn" class="">url</td><td id="UuEe" class="">String</td><td id="|AzK" class="">Required</td><td id="c^Dy" class="">The URL of the TikTok video</td></tr></tbody></table><h3 id="661a9b6c-04ea-47e1-99ad-ae10b982e963" class="">Response</h3><p id="77cef42f-b999-4ff0-b922-3fd435f8ae75" class="">Returns a JSON object with following properties:</p><ul id="dcef5bf2-5f58-4f82-982a-a3ba561cc473" class="bulleted-list"><li style="list-style-type:disc"><strong><code>status</code></strong> (String): Represents the status of the response.</li></ul><ul id="da7ec4d2-bc96-4457-9b5f-bc22fd15b25f" class="bulleted-list"><li style="list-style-type:disc"><code><strong>result</strong></code> (Object): Contains detailed information about the TikTok content.<ul id="46d28b99-67d4-4978-9147-3a259d9c5b0a" class="bulleted-list"><li style="list-style-type:circle"><code><strong>type</strong></code> (String): Indicates the type of content, in this case, it&#x27;s &quot;image.&quot;</li></ul><ul id="ca61d1b8-62fa-4823-a26f-24e31978117d" class="bulleted-list"><li style="list-style-type:circle"><code><strong>id</strong></code> (String): Unique identifier for the TikTok content.</li></ul><ul id="89b51e78-08b3-4226-a4f2-d7fa6df85e09" class="bulleted-list"><li style="list-style-type:circle"><code><strong>createTime</strong></code> (Integer): Timestamp indicating the creation time.</li></ul><ul id="a49465cc-5570-444f-892c-4dc734de17a8" class="bulleted-list"><li style="list-style-type:circle"><code><strong>description</strong></code> (String): Descriptive hashtags related to the content.</li></ul><ul id="a2cd8b83-1d3a-4d6b-8c91-ac7cc6d487fb" class="bulleted-list"><li style="list-style-type:circle"><code><strong>hashtag</strong></code> (Array of Strings): Array containing individual hashtags associated with the content.</li></ul><ul id="1a542e91-f567-479b-b298-e417410c7ab2" class="bulleted-list"><li style="list-style-type:circle"><code><strong>author</strong></code> (Object): Information about the TikTok content&#x27;s author.<ul id="a5d47c39-09e2-4e5f-82bc-df812fc9b587" class="bulleted-list"><li style="list-style-type:square"><code><strong>uid</strong></code> (String): Author&#x27;s unique identifier.</li></ul><ul id="329dff3d-c23d-4843-9bca-aa03b46dfa1f" class="bulleted-list"><li style="list-style-type:square"><code><strong>username</strong></code> (String): Author&#x27;s TikTok username.</li></ul><ul id="648a4bac-36c6-4e0d-92bb-0d04c5335965" class="bulleted-list"><li style="list-style-type:square"><code><strong>nickname</strong></code> (String): Author&#x27;s nickname.</li></ul><ul id="2709ce24-2f62-4f18-9002-0413dddacf48" class="bulleted-list"><li style="list-style-type:square"><code><strong>signature</strong></code> (String): Author&#x27;s signature or bio.</li></ul><ul id="724d69e1-1e35-44d3-acc0-de0a58d07f55" class="bulleted-list"><li style="list-style-type:square"><code><strong>region</strong></code> (String): Author&#x27;s region.</li></ul><ul id="476a7930-5d3c-41fc-9d33-dd681e03d383" class="bulleted-list"><li style="list-style-type:square"><code><strong>avatarThumb</strong></code> (Array of Strings): Thumbnails for the author&#x27;s avatar in different sizes.</li></ul><ul id="9b56aacb-530e-4e9d-a63d-d2ced7e4d37d" class="bulleted-list"><li style="list-style-type:square"><code><strong>avatarMedium</strong></code> (Array of Strings): Medium-sized avatars for the author.</li></ul><ul id="a70a4f7a-ae82-46f4-acef-955297c877d1" class="bulleted-list"><li style="list-style-type:square"><code><strong>url</strong></code> (String): URL link to the author&#x27;s TikTok profile.</li></ul></li></ul><ul id="64a67d13-1eb2-40bd-9124-ddcc8ffe2af6" class="bulleted-list"><li style="list-style-type:circle"><code><strong>statistics</strong></code> (Object): Various statistics related to the TikTok content.<ul id="3eca6383-3ecb-45ae-a8f4-a2f4063638ab" class="bulleted-list"><li style="list-style-type:square"><code><strong>playCount</strong></code> (Integer): Number of times the content has been played.</li></ul><ul id="b3424af4-1df8-4a5f-8fff-4274c905381d" class="bulleted-list"><li style="list-style-type:square"><code><strong>downloadCount</strong></code> (Integer): Number of downloads.</li></ul><ul id="41345fa7-3c6a-4993-a64b-2a65da5d64f7" class="bulleted-list"><li style="list-style-type:square"><code><strong>shareCount</strong></code> (Integer): Number of shares.</li></ul><ul id="d653918d-4970-4c0a-bea9-40b88afe4165" class="bulleted-list"><li style="list-style-type:square"><code><strong>commentCount</strong></code> (Integer): Number of comments.</li></ul><ul id="0624150b-1a66-4070-8612-b1dd144b3276" class="bulleted-list"><li style="list-style-type:square"><code><strong>likeCount</strong></code> (Integer): Number of likes.</li></ul><ul id="23f1a5dc-ce2d-40a0-a811-70cc5808bb4b" class="bulleted-list"><li style="list-style-type:square"><code><strong>favoriteCount</strong></code> (Integer): Number of times the content has been marked as a favorite.</li></ul><ul id="5c0953bb-66c5-4565-bd22-b705086c2538" class="bulleted-list"><li style="list-style-type:square"><code><strong>forwardCount</strong></code> (Integer): Number of times the content has been forwarded.</li></ul><ul id="20904dc6-4fc6-40a5-9b94-ba4814f222b6" class="bulleted-list"><li style="list-style-type:square"><code><strong>whatsappShareCount</strong></code> (Integer): Number of times the content has been shared on WhatsApp.</li></ul><ul id="358b9d6c-b894-477c-9a0f-11ebe3c48c04" class="bulleted-list"><li style="list-style-type:square"><code><strong>loseCount</strong></code> (Integer): Count related to losing.</li></ul><ul id="c34aa849-c624-438f-8915-ea47f941a165" class="bulleted-list"><li style="list-style-type:square"><code><strong>loseCommentCount</strong></code> (Integer): Count related to losing comments.</li></ul></li></ul><ul id="a0c24033-9ac0-4f36-ba5e-9610f8392e77" class="bulleted-list"><li style="list-style-type:circle"><code><strong>images</strong></code> (Array of Strings): Array containing URLs of images associated with the TikTok content.</li></ul><ul id="5da24c63-cb38-4fbd-b841-1f3a31f87df3" class="bulleted-list"><li style="list-style-type:circle"><code><strong>music</strong></code> (Object): Information about the music associated with the TikTok content.<ul id="6c75229f-e0c5-401f-b340-b85b2a971606" class="bulleted-list"><li style="list-style-type:square"><code><strong>id</strong></code> (Integer): Unique identifier for the music.</li></ul><ul id="3a654bcf-d9aa-4704-8bda-bd4e73b31ff1" class="bulleted-list"><li style="list-style-type:square"><code><strong>title</strong></code> (String): Title of the music.</li></ul><ul id="f22e5d67-4241-4c04-a1ed-43c681b84175" class="bulleted-list"><li style="list-style-type:square"><code><strong>author</strong></code> (String): Author or artist of the music.</li></ul><ul id="64f664be-ae77-4c04-b6fd-d68e9be4f3e3" class="bulleted-list"><li style="list-style-type:square"><code><strong>album</strong></code> (String): Album associated with the music.</li></ul><ul id="d107348e-9edd-4353-b542-183dc7b4d250" class="bulleted-list"><li style="list-style-type:square"><code><strong>playUrl</strong></code> (Array of Strings): URLs for playing the music.</li></ul><ul id="a94fba28-8dc0-4f7c-b746-128d747d7894" class="bulleted-list"><li style="list-style-type:square"><code><strong>coverLarge</strong></code> (Array of Strings): URLs of large-sized music cover images.</li></ul><ul id="03fffe7d-0da9-43c1-a115-f6c362a3cc04" class="bulleted-list"><li style="list-style-type:square"><code><strong>coverMedium</strong></code> (Array of Strings): URLs of medium-sized music cover images.</li></ul><ul id="f4527260-043d-4d4a-8247-64d0c27d4660" class="bulleted-list"><li style="list-style-type:square"><code><strong>coverThumb</strong></code> (Array of Strings): URLs of thumbnail-sized music cover images.</li></ul><ul id="4beb4e5b-6f07-443e-9dbf-ff681674f7ac" class="bulleted-list"><li style="list-style-type:square"><code><strong>duration</strong></code> (Integer): Duration of the music in seconds.</li></ul></li></ul></li></ul><h3 id="71c6796e-edad-423f-9115-606b50b82b46" class="">Example</h3><p id="b6cfc593-7c87-4ad0-ab5e-fb3c9667ebe4" class="">Request:</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="9a35b546-11aa-49ef-a607-b55afb0a5dbc" class="code"><code class="language-Plain Text">GET tk/details?url=https://vm.tiktok.com/ZM6QFcJrx/</code></pre><p id="20ea17f5-3b35-4d02-ab06-4f33323debfe" class="">Response:</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="cccf3330-7b51-4f03-88ee-5b9d6dd30891" class="code"><code class="language-JSON">{
+    &quot;status&quot;: &quot;success&quot;,
+    &quot;result&quot;: {
+        &quot;type&quot;: &quot;image&quot;,
+        &quot;id&quot;: &quot;7306451798846377222&quot;,
+        &quot;createTime&quot;: 1701165878,
+        &quot;description&quot;: &quot;#fyp #viral #foryoupage #foryou #vaiprofycaramba #foryou #fyy #desoertador #toque #onepiece &quot;,
+        &quot;hashtag&quot;: [
+            &quot;fyp&quot;,
+            &quot;viral&quot;,
+            &quot;foryoupage&quot;,
+            &quot;foryou&quot;,
+            &quot;vaiprofycaramba&quot;,
+            &quot;foryou&quot;,
+            &quot;fyy&quot;,
+            &quot;desoertador&quot;,
+            &quot;toque&quot;,
+            &quot;onepiece&quot;
+        ],
+        &quot;author&quot;: {
+            &quot;uid&quot;: &quot;6956270194781078534&quot;,
+            &quot;username&quot;: &quot;kyztrem_79&quot;,
+            &quot;nickname&quot;: &quot;kayquex 🥏&quot;,
+            &quot;signature&quot;: &quot;Eu Te Desejo Em Dobro, Tudo Aquilo Que Me Desejares.🌿📿\n68k🚀&quot;,
+            &quot;region&quot;: &quot;BR&quot;,
+            &quot;avatarThumb&quot;: [
+                &quot;https://p16-sign-va.tiktokcdn.com/tos-maliva-avt-0068/10fdd442bce8b5e891259d7fd1247206~c5_100x100.webp?lk3s=45126217&amp;x-expires=1705449600&amp;x-signature=oFryS6fAIAAzLTjwxmPLYwJjsP0%3D&quot;,
+                &quot;https://p16-sign-va.tiktokcdn.com/tos-maliva-avt-0068/10fdd442bce8b5e891259d7fd1247206~c5_100x100.jpeg?lk3s=45126217&amp;x-expires=1705449600&amp;x-signature=wjIlLTCmGcAKgLUphJ6RVRBzrCY%3D&quot;
+            ],
+            &quot;avatarMedium&quot;: [
+                &quot;https://p16-sign-va.tiktokcdn.com/tos-maliva-avt-0068/10fdd442bce8b5e891259d7fd1247206~c5_720x720.webp?lk3s=45126217&amp;x-expires=1705449600&amp;x-signature=wAHGbL1RcQaU12XTx70ku79e%2F%2Fo%3D&quot;,
+                &quot;https://p16-sign-va.tiktokcdn.com/tos-maliva-avt-0068/10fdd442bce8b5e891259d7fd1247206~c5_720x720.jpeg?lk3s=45126217&amp;x-expires=1705449600&amp;x-signature=zv6T%2FlKISgYWt02UEqM6qyBDCLE%3D&quot;
+            ],
+            &quot;url&quot;: &quot;https://www.tiktok.com/@kyztrem_79&quot;
+        },
+        &quot;statistics&quot;: {
+            &quot;playCount&quot;: 367865,
+            &quot;downloadCount&quot;: 1,
+            &quot;shareCount&quot;: 4490,
+            &quot;commentCount&quot;: 277,
+            &quot;likeCount&quot;: 33416,
+            &quot;favoriteCount&quot;: 7532,
+            &quot;forwardCount&quot;: 0,
+            &quot;whatsappShareCount&quot;: 478,
+            &quot;loseCount&quot;: 0,
+            &quot;loseCommentCount&quot;: 0
+        },
+        &quot;images&quot;: [
+            &quot;https://p16-sign-va.tiktokcdn.com/tos-maliva-i-photomode-us/4db1f695fcbb46f59d96eb54d17ef539~tplv-photomode-image-v1:q80.heic?from=photomode.FEED&amp;lk3s=d05b14bd&amp;x-expires=1706659200&amp;x-signature=M82cNexqDqUSoVwpUJ1H0EVUEVI%3D&quot;,
+            &quot;https://p16-sign-va.tiktokcdn.com/tos-maliva-i-photomode-us/0412421972f14a4db52ab79a6891de9f~tplv-photomode-image-v1:q80.heic?from=photomode.FEED&amp;lk3s=d05b14bd&amp;x-expires=1706659200&amp;x-signature=%2F7MIWgc691AZDSA4PZejnROPxu8%3D&quot;
+        ],
+        &quot;music&quot;: {
+            &quot;id&quot;: 7271660972153130000,
+            &quot;title&quot;: &quot;Binks No Sake _ One Piece _ Ringtone&quot;,
+            &quot;author&quot;: &quot;ηαкαмα👒♛&quot;,
+            &quot;album&quot;: &quot;&quot;,
+            &quot;playUrl&quot;: [
+                &quot;https://sf16-ies-music-va.tiktokcdn.com/obj/musically-maliva-obj/7271660974824983301.mp3&quot;
+            ],
+            &quot;coverLarge&quot;: [
+                &quot;https://p16-sign-va.tiktokcdn.com/tos-maliva-avt-0068/8673ac976170c38d1e928f2df394404f~c5_1080x1080.webp?lk3s=45126217&amp;x-expires=1705449600&amp;x-signature=g52ZN7vo%2BJXoSZBSiThQFwJfkI0%3D&quot;,
+                &quot;https://p16-sign-va.tiktokcdn.com/tos-maliva-avt-0068/8673ac976170c38d1e928f2df394404f~c5_1080x1080.jpeg?lk3s=45126217&amp;x-expires=1705449600&amp;x-signature=y6q2bKEM6M%2BkOg8LxqRCdL3RWYg%3D&quot;
+            ],
+            &quot;coverMedium&quot;: [
+                &quot;https://p16-sign-va.tiktokcdn.com/tos-maliva-avt-0068/8673ac976170c38d1e928f2df394404f~c5_720x720.webp?lk3s=45126217&amp;x-expires=1705449600&amp;x-signature=CiKQdpb%2FyEwJ0eA55iytoCH%2F%2Fe0%3D&quot;,
+                &quot;https://p16-sign-va.tiktokcdn.com/tos-maliva-avt-0068/8673ac976170c38d1e928f2df394404f~c5_720x720.jpeg?lk3s=45126217&amp;x-expires=1705449600&amp;x-signature=x6c%2B45JKmCUE1FK3hjy9HZfkkEs%3D&quot;
+            ],
+            &quot;coverThumb&quot;: [
+                &quot;https://p16-sign-va.tiktokcdn.com/tos-maliva-avt-0068/8673ac976170c38d1e928f2df394404f~c5_100x100.webp?lk3s=45126217&amp;x-expires=1705449600&amp;x-signature=T5XkPgYnOPoQBCczc3r3hoYYdkc%3D&quot;,
+                &quot;https://p16-sign-va.tiktokcdn.com/tos-maliva-avt-0068/8673ac976170c38d1e928f2df394404f~c5_100x100.jpeg?lk3s=45126217&amp;x-expires=1705449600&amp;x-signature=U0qz1NBf4dDNVQz54PLNqtOFFLk%3D&quot;
+            ],
+            &quot;duration&quot;: 28
+        }
+    }
+}</code></pre><h3 id="0d2c7130-d627-4d13-9f5b-5b14692318d7" class="">Errors</h3><p id="146f2ffc-3d97-44f7-9455-6d26ae8a6814" class="">This API uses the following error codes:</p><ul id="0d4517fe-2bf5-4775-b3e9-bbccefe2508d" class="bulleted-list"><li style="list-style-type:disc"><code>400 Bad Request</code>: The request was malformed or missing required parameters.</li></ul><ul id="5dc1fb54-6d68-49b0-a06d-9d69c31ce399" class="bulleted-list"><li style="list-style-type:disc"><code>401 Unauthorized</code>: The API Key provided was invalid or missing.</li></ul><ul id="b3681754-4453-4e74-8609-8a21d0ce39a7" class="bulleted-list"><li style="list-style-type:disc"><code>404 Not Found</code>: The requested resource was not found.</li></ul><ul id="df5ed0f6-44a3-4b11-97d2-168c3081d9ef" class="bulleted-list"><li style="list-style-type:disc"><code>500 Internal Server Error</code>: An unexpected error occurred on the server. </li></ul></details></li></ul><p id="cfa07811-9600-4629-88ac-06d5af68b6d5" class="">
+</p><p id="8ea6d152-29c4-47b6-9791-6f62a8b0e014" class="">
+</p></div></article><span class="sans" style="font-size:14px;padding-top:2em"></span></body></html>
