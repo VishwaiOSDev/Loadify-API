@@ -26,10 +26,18 @@ app.use(express.json()); // Parse JSON request bodies
 app.use(morgan(morganFormat)); // Log to console
 app.use(morgan(morganFormat, { stream: logStream })); // Log to file
 
+// Serve static files from the "docs" folder
+app.use(express.static(path.join(__dirname, "docs")));
+
 // Define your routes
 app.use("/api/yt/", require("./routes/youtube_routes"));
 app.use("/api/ig/", require("./routes/instagram_routes"));
 app.use("/api/tk/", require("./routes/tiktok_routes"));
+
+app.get("/", (_, res) => {
+    // Send the index.html file
+    res.sendFile(path.join(__dirname, "docs", "index.html"));
+});
 
 // Start the Express server
 app.listen(PORT, function () {
