@@ -14,7 +14,7 @@ const rateLimiterOptions = {
 
 const rateLimiter = new RateLimiterMemory(rateLimiterOptions);
 // use rate limiter on all root path methods
-app.all((req, res, next) => {
+app.use((req, res, next) => {
     rateLimiter
         .consume(req.connection.remoteAddress)
         .then(() => {
