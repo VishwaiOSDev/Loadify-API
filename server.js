@@ -2,9 +2,14 @@ const express = require("express");
 const morgan = require("morgan");
 const path = require("path");
 const fs = require("fs");
-const rateLimitMiddleware = require("./lib/rate_limiter");
 const app = express();
 const PORT = 3200;
+const { RateLimiterMemory } = require("rate-limiter-flexible");
+
+const limiter = new RateLimiterMemory({
+    points: 10,
+    duration: 3600,
+});
 
 app.set("trust proxy", true);
 
@@ -26,7 +31,23 @@ const morganFormat =
 app.use(express.json()); // Parse JSON request bodies
 app.use(morgan(morganFormat)); // Log to console
 app.use(morgan(morganFormat, { stream: logStream })); // Log to file
-app.use(rateLimitMiddleware); // Rate Limter
+app.use(async (ctx, next) => {
+    let allowed = true;
+    try {
+        await limiter.consume(ctx.ip);
+        await next();
+    } catch (e) {
+        ctx.status = 429;
+        ctx.body = "Too Many Requests";
+        allowed = false;
+    }
+    console.log(
+        "Request IP: %s, Allowed: %s, Url: %s",
+        ctx.ip,
+        allowed,
+        ctx.url
+    );
+});
 
 // Serve static files from the "docs" folder
 app.use(express.static(path.join(__dirname, "docs")));
