@@ -7,8 +7,8 @@ const PORT = 3200;
 const { RateLimiterMemory } = require("rate-limiter-flexible");
 
 const limiter = new RateLimiterMemory({
-    points: 10,
-    duration: 3600,
+    points: 10, // 10 requests
+    duration: 60, // 60 seconds
 });
 
 app.set("trust proxy", true);
