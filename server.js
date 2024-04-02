@@ -2,6 +2,7 @@ const express = require("express");
 const morgan = require("morgan");
 const path = require("path");
 const fs = require("fs");
+const rateLimitMiddleware = require("./lib/rate_limiter");
 const app = express();
 const PORT = 3200;
 
@@ -25,6 +26,7 @@ const morganFormat =
 app.use(express.json()); // Parse JSON request bodies
 app.use(morgan(morganFormat)); // Log to console
 app.use(morgan(morganFormat, { stream: logStream })); // Log to file
+app.use(rateLimitMiddleware); // Rate Limter
 
 // Serve static files from the "docs" folder
 app.use(express.static(path.join(__dirname, "docs")));
