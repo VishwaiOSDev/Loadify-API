@@ -2,13 +2,27 @@ const express = require("express");
 const morgan = require("morgan");
 const path = require("path");
 const fs = require("fs");
+const { RateLimiterMemory } = require("rate-limiter-flexible");
 const app = express();
 const PORT = 3200;
-const { RateLimiterMemory } = require("rate-limiter-flexible");
 
-const limiter = new RateLimiterMemory({
-    points: 10, // 10 requests
-    duration: 60, // 60 seconds
+// limit request to one per minute
+const rateLimiterOptions = {
+    points: 1,
+    duration: 60,
+};
+
+const rateLimiter = new RateLimiterMemory(rateLimiterOptions);
+// use rate limiter on all root path methods
+app.all((req, res, next) => {
+    rateLimiter
+        .consume(req.connection.remoteAddress)
+        .then(() => {
+            next();
+        })
+        .catch(() => {
+            res.status(429).json("Too Many Requests");
+        });
 });
 
 app.set("trust proxy", true);
@@ -31,17 +45,6 @@ const morganFormat =
 app.use(express.json()); // Parse JSON request bodies
 app.use(morgan(morganFormat)); // Log to console
 app.use(morgan(morganFormat, { stream: logStream })); // Log to file
-app.use(async (ctx, next) => {
-    let allowed = true;
-    try {
-        await limiter.consume(ctx.ip);
-        await next();
-    } catch (e) {
-        ctx.status = 429;
-        ctx.body = "Too Many Requests";
-        allowed = false;
-    }
-});
 
 // Serve static files from the "docs" folder
 app.use(express.static(path.join(__dirname, "docs")));
