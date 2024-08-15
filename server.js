@@ -2,28 +2,8 @@ const express = require("express");
 const morgan = require("morgan");
 const path = require("path");
 const fs = require("fs");
-const { RateLimiterMemory } = require("rate-limiter-flexible");
 const app = express();
 const PORT = 3200;
-
-// limit request to one per minute
-const rateLimiterOptions = {
-    points: 1,
-    duration: 60,
-};
-
-const rateLimiter = new RateLimiterMemory(rateLimiterOptions);
-// use rate limiter on all root path methods
-app.use((req, res, next) => {
-    rateLimiter
-        .consume(req.connection.remoteAddress)
-        .then(() => {
-            next();
-        })
-        .catch(() => {
-            res.status(429).json("Too Many Requests");
-        });
-});
 
 app.set("trust proxy", true);
 
