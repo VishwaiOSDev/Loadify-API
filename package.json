@@ -21,6 +21,6 @@
         "nodemon": "^3.0.1",
         "pm2": "^5.3.0",
         "rate-limiter-flexible": "^5.0.0",
-        "ytdl-core": "^4.11.5"
+        "ytdl-core": "npm:@distube/ytdl-core@^4.15.9"
     }
 }
